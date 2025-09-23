@@ -1,0 +1,2930 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendavalStore - Sistema de Gestão</title>
+    <!-- Tailwind CSS CDN para estilização rápida e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Fundo azul escuro principal */
+            color: #f8fafc; /* Cor do texto padrão para contraste */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .form-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        /* Nova estilização para botões de navegação */
+        .nav-button.active {
+            @apply bg-blue-600 text-white shadow-md;
+        }
+        .nav-button:not(.active) {
+            @apply bg-slate-700 text-slate-300;
+        }
+        .nav-button {
+            @apply flex items-center justify-center sm:justify-start gap-2 font-medium py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105;
+        }
+        /* Corrigir o layout do cabeçalho em telas menores */
+        @media (max-width: 640px) {
+            .nav-button {
+                width: 100%;
+            }
+        }
+        .card {
+            @apply bg-slate-800 rounded-2xl shadow-xl p-6;
+        }
+        .table-header {
+            @apply bg-slate-900;
+        }
+        .table-row-hover:hover {
+            background-color: #1e293b;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 min-h-screen">
+    
+    <div id="login-section" class="flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="bg-slate-800 rounded-2xl shadow-xl p-8 w-full max-w-sm">
+            <h2 class="text-3xl font-bold text-white text-center mb-6">VendavalStore</h2>
+            <p class="text-slate-400 text-center mb-8">Faça login para continuar</p>
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-300">Email:</label>
+                    <input type="email" id="email" required class="mt-1 block w-full rounded-lg border-slate-700 bg-slate-900 text-white shadow-sm p-3 border-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-slate-300">Senha:</label>
+                    <input type="password" id="password" required class="mt-1 block w-full rounded-lg border-slate-700 bg-slate-900 text-white shadow-sm p-3 border-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">Entrar</button>
+                </div>
+                <div class="text-center mt-4">
+                    <button type="button" id="createAdminBtn" class="text-sm text-slate-400 hover:text-white underline">Criar Conta de Administrador</button>
+                </div>
+            </form>
+        </div>
+        <!-- Assinatura da AJRSystem fixa no canto inferior direito -->
+        <div class="fixed bottom-4 right-4 text-xs text-slate-400">
+            AJRSystem – Transformando processos em produtividade.
+        </div>
+    </div>
+
+    <div id="main-content" class="container mx-auto p-4 sm:p-6 lg:p-8 hidden">
+        <!-- Título e navegação principal -->
+        <header class="bg-slate-800 rounded-xl shadow-lg p-6 mb-8 flex flex-col sm:flex-row justify-between items-center">
+            <div class="flex items-center gap-4 mb-4 sm:mb-0">
+                <img src="https://i.ibb.co/tMstwg7h/Whats-App-Image-2025-09-08-at-22-07-45.jpg" alt="Logo da VendavalStore" class="h-12 w-12 rounded-full">
+                <h1 class="text-3xl font-bold text-white">VendavalStore</h1>
+            </div>
+            <nav class="flex flex-wrap gap-2 sm:gap-4">
+                <button onclick="showSection('dashboard')" class="nav-button active">
+                    <i class="fas fa-home"></i> <span class="hidden sm:inline">Início</span>
+                </button>
+                <button onclick="showSection('clientes')" class="nav-button">
+                    <i class="fas fa-users"></i> <span class="hidden sm:inline">Clientes</span>
+                </button>
+                <button onclick="showSection('produtos')" class="nav-button">
+                    <i class="fas fa-box-open"></i> <span class="hidden sm:inline">Produtos</span>
+                </button>
+                <button onclick="showSection('eventos')" class="nav-button">
+                    <i class="fas fa-calendar-alt"></i> <span class="hidden sm:inline">Eventos</span>
+                </button>
+                <button onclick="showSection('vendas')" class="nav-button">
+                    <i class="fas fa-shopping-cart"></i> <span class="hidden sm:inline">Vendas</span>
+                </button>
+                <button onclick="showSection('relatorios')" class="nav-button">
+                    <i class="fas fa-chart-bar"></i> <span class="hidden sm:inline">Relatórios</span>
+                </button>
+                <button onclick="openTextEditModal()" class="nav-button">
+                    <i class="fas fa-pen"></i> <span class="hidden sm:inline">Editar Texto</span>
+                </button>
+                <button onclick="showBackupModal()" class="nav-button bg-slate-600 hover:bg-slate-500 text-white">
+                    <i class="fas fa-cloud-upload-alt"></i> <span class="hidden sm:inline">Backup</span>
+                </button>
+                <button onclick="logout()" class="nav-button bg-red-500 hover:bg-red-600 text-white">
+                    <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Sair</span>
+                </button>
+            </nav>
+        </header>
+
+        <!-- Seções de Conteúdo -->
+        <div id="setup-instructions" class="bg-yellow-800 text-yellow-100 p-4 rounded-lg mb-6 hidden">
+            <h3 class="font-bold text-lg mb-2">Atenção: Configuração Necessária!</h3>
+            <p>Para que o VendavalStore salve seus dados, você precisa conectar seu próprio banco de dados Firebase.</p>
+            <ol class="list-decimal list-inside mt-2">
+                <li>Vá para o <a href="https://console.firebase.google.com/" target="_blank" class="font-semibold underline">console do Firebase</a> e crie um novo projeto.</li>
+                <li>Adicione um novo aplicativo Web. Copie o código de configuração que o Firebase fornecerá.</li>
+                <li>Abra este arquivo (`vendaval_store.html`) em um editor de texto e cole o código de configuração no lugar do placeholder <code>// PASTE YOUR FIREBASE CONFIG HERE</code> no script abaixo.</li>
+                <li>Pronto! Recarregue a página e o sistema funcionará normalmente no seu computador.</li>
+            </ol>
+            <p class="mt-4">Assim que a configuração for concluída, esta mensagem desaparecerá e o programa será habilitado.</p>
+        </div>
+
+        <!-- Seção de Dashboard -->
+        <main id="dashboard" class="content-section active card">
+            <h2 class="text-2xl font-semibold text-white mb-4">Visão Geral</h2>
+            <div id="dashboard-stats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900 p-6 rounded-lg shadow-inner flex items-center justify-between h-40">
+                    <div class="flex flex-col">
+                        <h3 class="text-blue-400 text-base font-semibold">Total de Vendas Registradas</h3>
+                        <p id="totalSalesCount" class="mt-2 text-4xl font-extrabold text-blue-500">0</p>
+                    </div>
+                    <i class="fas fa-shopping-cart text-5xl text-blue-800"></i>
+                </div>
+                <div class="bg-slate-900 p-6 rounded-lg shadow-inner flex items-center justify-between h-40">
+                    <div class="flex flex-col">
+                        <h3 class="text-green-400 text-base font-semibold">Faturamento Total</h3>
+                        <p id="totalRevenue" class="mt-2 text-4xl font-extrabold text-green-500">R$ 0,00</p>
+                    </div>
+                    <i class="fas fa-dollar-sign text-5xl text-green-800"></i>
+                </div>
+                <div class="bg-slate-900 p-6 rounded-lg shadow-inner flex items-center justify-between h-40">
+                    <div class="flex flex-col">
+                        <h3 class="text-purple-400 text-base font-semibold">Clientes Cadastrados</h3>
+                        <p id="totalClientsCount" class="mt-2 text-4xl font-extrabold text-purple-500">0</p>
+                    </div>
+                    <i class="fas fa-users text-5xl text-purple-800"></i>
+                </div>
+                <div class="bg-slate-900 p-6 rounded-lg shadow-inner flex items-center justify-between h-40">
+                    <div class="flex flex-col">
+                        <h3 class="text-gray-400 text-base font-semibold">Produtos em Estoque</h3>
+                        <p id="totalProductsCount" class="mt-2 text-4xl font-extrabold text-gray-500">0</p>
+                    </div>
+                    <i class="fas fa-box-open text-5xl text-gray-700"></i>
+                </div>
+            </div>
+            
+            <div id="dashboard-financial-stats" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+                <div class="bg-slate-900 p-6 rounded-lg shadow-inner">
+                    <h3 class="text-base font-semibold text-white">Valor Total de Produtos Vendidos</h3>
+                    <p id="totalSalesValue" class="mt-2 text-3xl font-extrabold text-green-500">R$ 0,00</p>
+                </div>
+                <div class="bg-slate-900 p-6 rounded-lg shadow-inner">
+                    <h3 class="text-base font-semibold text-white">Total Recebido</h3>
+                    <p id="totalReceivedValue" class="mt-2 text-3xl font-extrabold text-blue-500">R$ 0,00</p>
+                </div>
+                <div class="bg-slate-900 p-6 rounded-lg shadow-inner">
+                    <h3 class="text-base font-semibold text-white">Valor a Receber</h3>
+                    <p id="totalPendingValue" class="mt-2 text-3xl font-extrabold text-orange-500">R$ 0,00</p>
+                </div>
+            </div>
+            
+            <div class="mt-8">
+                <h3 class="text-2xl font-semibold text-white mb-4">Aniversariantes do Mês</h3>
+                <div id="birthdaysList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <!-- Aniversariantes serão listados aqui -->
+                </div>
+            </div>
+
+            <div id="connection-status" class="mt-4 p-4 bg-slate-700 rounded-md text-sm text-slate-300">
+                <span id="status-message">Conectando ao banco de dados...</span>
+            </div>
+        </main>
+
+        <!-- Seção de Clientes -->
+        <div id="clientes" class="content-section card">
+            <h2 class="text-2xl font-semibold text-white mb-4">Cadastro de Clientes</h2>
+            <form id="clientForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label for="clientName" class="block text-sm font-medium text-slate-300">Nome:</label>
+                    <input type="text" id="clientName" required class="mt-1 block w-full rounded-lg border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                <div>
+                    <label for="clientCpf" class="block text-sm font-medium text-slate-300">CPF:</label>
+                    <input type="text" id="clientCpf" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                <div>
+                    <label for="clientPhone" class="block text-sm font-medium text-slate-300">Telefone:</label>
+                    <input type="tel" id="clientPhone" class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                <div>
+                    <label for="clientEmergencyContactName" class="block text-sm font-medium text-slate-300">Nome do Contato de Emergência:</label>
+                    <input type="text" id="clientEmergencyContactName" class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                <div>
+                    <label for="clientEmergencyContact" class="block text-sm font-medium text-slate-300">Telefone do Contato de Emergência:</label>
+                    <input type="text" id="clientEmergencyContact" class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                <div>
+                    <label for="clientEmail" class="block text-sm font-medium text-slate-300">E-mail:</label>
+                    <input type="email" id="clientEmail" class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                <div class="sm:col-span-2">
+                    <label for="clientBirthDate" class="block text-sm font-medium text-slate-300">Data de Nascimento:</label>
+                    <input type="date" id="clientBirthDate" class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                <div class="sm:col-span-2 flex justify-end">
+                    <button type="submit" class="form-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105" disabled>
+                        <i class="fas fa-save mr-2"></i> Salvar Cliente
+                    </button>
+                </div>
+            </form>
+
+            <h3 class="text-xl font-semibold text-white mb-2">Lista de Clientes</h3>
+            <div class="overflow-x-auto rounded-lg shadow-md">
+                <table class="min-w-full bg-slate-800 rounded-lg">
+                    <thead class="bg-slate-700">
+                        <tr>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Nome</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">CPF</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Contato</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Nome do Contato de Emergência</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Telefone do Contato de Emergência</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsTableBody" class="divide-y divide-slate-700">
+                        <!-- Clientes carregados dinamicamente aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Nova Seção de Produtos -->
+        <div id="produtos" class="content-section card">
+            <h2 class="text-2xl font-semibold text-white mb-4">Cadastro de Produtos</h2>
+            <form id="productForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <label for="productName" class="block text-sm font-medium text-slate-300">Nome do Produto:</label>
+                    <input type="text" id="productName" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                <div>
+                    <label for="productCost" class="block text-sm font-medium text-slate-300">Valor de Custo (R$):</label>
+                    <input type="number" id="productCost" step="0.01" value="0.00" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                <div>
+                    <label for="productStock" class="block text-sm font-medium text-slate-300">Estoque:</label>
+                    <input type="number" id="productStock" value="0" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                <div class="sm:col-span-3 flex justify-end">
+                    <button type="submit" class="form-button bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105" disabled>
+                        <i class="fas fa-save mr-2"></i> Salvar Produto
+                    </button>
+                </div>
+            </form>
+            
+            <div class="flex items-center justify-between bg-slate-900 rounded-lg p-4 mb-6">
+                <span class="text-xl font-bold text-white">Valor Total do Estoque:</span>
+                <p class="text-2xl font-extrabold text-green-500">
+                    <span id="totalStockValue">R$ 0,00</span>
+                </p>
+            </div>
+
+
+            <h3 class="text-xl font-semibold text-white mb-2">Lista de Produtos</h3>
+            <div class="overflow-x-auto rounded-lg shadow-md">
+                <table class="min-w-full bg-slate-800 rounded-lg">
+                    <thead class="bg-slate-700">
+                        <tr>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Código</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Nome do Produto</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Valor de Custo</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Estoque</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody" class="divide-y divide-slate-700">
+                        <!-- Produtos carregados dinamicamente aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Nova Seção de Eventos -->
+        <div id="eventos" class="content-section card">
+            <h2 class="text-2xl font-semibold text-white mb-4">Cadastro de Eventos</h2>
+            <form id="eventForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label for="eventName" class="block text-sm font-medium text-slate-300">Nome do Evento:</label>
+                    <input type="text" id="eventName" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                <div class="sm:col-span-2 flex justify-end">
+                    <button type="submit" class="form-button bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105" disabled>
+                        <i class="fas fa-save mr-2"></i> Salvar Evento
+                    </button>
+                </div>
+            </form>
+            <h3 class="text-xl font-semibold text-white mb-2">Lista de Eventos</h3>
+            <div class="overflow-x-auto rounded-lg shadow-md">
+                <table class="min-w-full bg-slate-800 rounded-lg">
+                    <thead class="bg-slate-700">
+                        <tr>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Nome do Evento</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsTableBody" class="divide-y divide-slate-700">
+                        <!-- Eventos carregados dinamicamente aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Seção de Vendas -->
+        <div id="vendas" class="content-section card">
+            <h2 class="text-2xl font-semibold text-white mb-4">Cadastro e Gestão de Vendas</h2>
+            
+            <form id="saleForm" class="space-y-4 mb-6">
+                <div>
+                    <label for="saleClient" class="block text-sm font-medium text-slate-300">Cliente:</label>
+                    <select id="saleClient" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2"></select>
+                </div>
+                <div>
+                    <label for="saleEvent" class="block text-sm font-medium text-slate-300">Nome do Evento:</label>
+                    <select id="saleEvent" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2"></select>
+                </div>
+                <div class="bg-slate-900 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-semibold text-white">Produtos da Venda</h3>
+                        <button type="button" onclick="openProductSelectionModal('new-sale')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-plus-circle mr-2"></i> Adicionar Produtos
+                        </button>
+                    </div>
+                    <div id="newSaleProductsList" class="space-y-2 text-slate-300">
+                        <!-- Produtos selecionados serão renderizados aqui -->
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xl font-bold text-white">Valor Total:</span>
+                        <span id="saleTotalValue" class="text-2xl font-extrabold text-green-500">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="salePaymentMethod" class="block text-sm font-medium text-slate-300">Forma de Pagamento:</label>
+                    <select id="salePaymentMethod" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                        <option value="pix-a-vista">Pix à vista</option>
+                        <option value="pix-parcelado">Pix parcelado</option>
+                    </select>
+                </div>
+                <div id="installmentsWrapper" class="hidden">
+                    <label for="saleInstallments" class="block text-sm font-medium text-slate-300">Número de Parcelas (1x até 36x):</label>
+                    <input type="number" id="saleInstallments" min="1" max="36" value="1" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                </div>
+                
+                <div class="flex justify-end mt-4">
+                    <button type="submit" class="form-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105" disabled>
+                        <i class="fas fa-money-check-alt mr-2"></i> Gerar Venda
+                    </button>
+                </div>
+            </form>
+            
+            <h3 class="text-xl font-semibold text-white mb-2 mt-8">Histórico de Vendas</h3>
+            <!-- Campo de pesquisa de vendas -->
+            <div class="mb-4">
+                <input type="text" id="saleSearchInput" placeholder="Pesquisar vendas por ID..." class="w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="overflow-x-auto rounded-lg shadow-md">
+                <table class="min-w-full bg-slate-800 rounded-lg">
+                    <thead class="bg-slate-700">
+                        <tr>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">ID</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Cliente</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Produto(s)</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Valor</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Data</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Status</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesTableBody" class="divide-y divide-slate-700">
+                        <!-- Vendas carregadas dinamicamente aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Seção de Relatórios -->
+        <div id="relatorios" class="content-section card">
+            <h2 class="text-2xl font-semibold text-white mb-4">Relatórios de Vendas e Faturamento</h2>
+            <div id="reports-content" class="text-slate-300">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                        <p class="text-sm font-semibold text-slate-400">Faturamento Total</p>
+                        <p id="reportsTotalRevenue" class="mt-1 text-2xl font-bold text-white">R$ 0,00</p>
+                    </div>
+                    <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                        <p class="text-sm font-semibold text-slate-400">Vendas Pagas</p>
+                        <p id="paidSalesCount" class="mt-1 text-2xl font-bold text-green-500">0</p>
+                    </div>
+                    <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                        <p class="text-sm font-semibold text-slate-400">Vendas Em Andamento</p>
+                        <p id="inProgressSalesCount" class="mt-1 text-2xl font-bold text-blue-500">0</p>
+                    </div>
+                    <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                        <p class="text-sm font-semibold text-slate-400">Vendas Vencidas</p>
+                        <p id="overdueSalesCount" class="mt-1 text-2xl font-bold text-orange-500">0</p>
+                    </div>
+                     <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                        <p class="text-sm font-semibold text-slate-400">Vendas Faltando a Pagar</p>
+                        <p id="pendingPaymentCount" class="mt-1 text-2xl font-bold text-orange-500">0</p>
+                    </div>
+                    <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                        <p class="text-sm font-semibold text-slate-400">Vendas Canceladas</p>
+                        <p id="canceledSalesCount" class="mt-1 text-2xl font-bold text-red-500">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+                <button onclick="downloadDetailedReport('json')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-file-download mr-2"></i> Baixar Relatório Completo (JSON)
+                </button>
+                <button onclick="visualizarRelatorioPdf()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-file-pdf"></i> Visualizar Relatório Completo (PDF)
+                </button>
+            </div>
+        </div>
+        
+        <!-- Modal de Confirmação -->
+        <div id="modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
+                <h3 class="text-lg font-semibold text-white mb-4">Confirmação</h3>
+                <p id="modal-message" class="text-slate-300 mb-6"></p>
+                <div class="flex justify-end gap-2">
+                    <button id="modal-cancel-btn" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">Cancelar</button>
+                    <button id="modal-confirm-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">Confirmar</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal de Pagamento (agora também para edição de produtos) -->
+        <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-lg">
+                <h3 class="text-2xl font-semibold text-white mb-4 text-center">Gestão de Venda e Parcelas</h3>
+                
+                <div class="mb-4">
+                    <p class="text-lg font-semibold text-white mb-2">Itens da Venda:</p>
+                    <ul id="editSaleProductsList" class="space-y-2 max-h-48 overflow-y-auto">
+                        <!-- Produtos da venda serão carregados aqui -->
+                    </ul>
+                    <div class="flex justify-end mt-2">
+                        <button type="button" onclick="openProductSelectionModal('edit-sale')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-edit mr-2"></i> Adicionar/Alterar Produtos
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <p class="text-lg font-semibold text-white mb-2">Informações da Venda:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div>
+                            <label for="editSaleEventSelect" class="block text-sm font-medium text-slate-300">Nome do Evento:</label>
+                            <select id="editSaleEventSelect" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2"></select>
+                        </div>
+                        <div>
+                            <label for="editSaleTotalValue" class="block text-sm font-medium text-slate-300">Valor Total da Venda (R$):</label>
+                            <input type="number" id="editSaleTotalValue" step="0.01" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                        </div>
+                        <div>
+                            <label for="editSalePaymentMethod" class="block text-sm font-medium text-slate-300">Forma de Pagamento:</label>
+                            <select id="editSalePaymentMethod" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                                <option value="pix-a-vista">Pix à vista</option>
+                                <option value="pix-parcelado">Pix parcelado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <p class="text-lg font-semibold text-white mb-2">Gestão de Parcelas:</p>
+                    <div id="parcelList" class="max-h-48 overflow-y-auto border-t border-b border-slate-700 py-4 text-slate-300">
+                        <!-- Parcelas serão inseridas aqui dinamicamente -->
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-end gap-2 mt-4">
+                    <button id="saveChangesBtn" onclick="saveAllChanges()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-save mr-2"></i> Salvar Alterações
+                    </button>
+                    <button onclick="saveAndSendEmail()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-envelope mr-2"></i> Salvar e Enviar E-mail
+                    </button>
+                    <button onclick="saveAndVisualizarPdf()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-file-pdf mr-2"></i> Salvar e Visualizar PDF
+                    </button>
+                    <button onclick="hidePaymentModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-times-circle mr-2"></i> Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Backup/Restauro -->
+        <div id="backupModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
+                <h3 class="text-lg font-semibold text-white mb-4 text-center">Gestão de Backup</h3>
+                <p class="text-slate-300 text-center mb-6">Selecione uma opção para gerir os seus dados.</p>
+                <div class="space-y-4">
+                    <button onclick="downloadBackup()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-download mr-2"></i> Baixar Backup Atual
+                    </button>
+                    <label for="restore-file" class="w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105 cursor-pointer block">
+                        <i class="fas fa-upload mr-2"></i> Carregar Dados do Backup
+                    </label>
+                    <input type="file" id="restore-file" accept="application/json" class="hidden">
+                    <button onclick="hideBackupModal()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-times-circle mr-2"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Edição de Produto -->
+        <div id="editProductModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
+                <h3 class="text-lg font-semibold text-white mb-4 text-center">Editar Produto</h3>
+                <form id="editProductForm" class="space-y-4">
+                    <div>
+                        <label for="editProductName" class="block text-sm font-medium text-slate-300">Nome do Produto:</label>
+                        <input type="text" id="editProductName" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                    </div>
+                    <div>
+                        <label for="editProductCost" class="block text-sm font-medium text-slate-300">Valor de Custo (R$):</label>
+                        <input type="number" id="editProductCost" step="0.01" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                    </div>
+                    <div>
+                        <label for="editProductStock" class="block text-sm font-medium text-slate-300">Estoque:</label>
+                        <input type="number" id="editProductStock" value="0" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                    </div>
+                    <div class="flex justify-end gap-2 mt-4">
+                        <button type="button" onclick="hideEditProductModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">Cancelar</button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Novo Modal de Edição de Cliente -->
+        <div id="editClientModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-lg">
+                <h3 class="text-2xl font-semibold text-white mb-4 text-center">Editar Dados do Cliente</h3>
+                <form id="editClientForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="editClientName" class="block text-sm font-medium text-slate-300">Nome:</label>
+                        <input type="text" id="editClientName" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                    </div>
+                    <div>
+                        <label for="editClientCpf" class="block text-sm font-medium text-slate-300">CPF:</label>
+                        <input type="text" id="editClientCpf" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                    </div>
+                    <div>
+                        <label for="editClientPhone" class="block text-sm font-medium text-slate-300">Telefone:</label>
+                        <input type="tel" id="editClientPhone" class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                    </div>
+                    <div>
+                        <label for="editClientEmergencyContactName" class="block text-sm font-medium text-slate-300">Nome do Contato de Emergência:</label>
+                        <input type="text" id="editClientEmergencyContactName" class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                    </div>
+                    <div>
+                        <label for="editClientEmergencyContact" class="block text-sm font-medium text-slate-300">Telefone do Contato de Emergência:</label>
+                        <input type="text" id="editClientEmergencyContact" class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                    </div>
+                    <div>
+                        <label for="editClientEmail" class="block text-sm font-medium text-slate-300">E-mail:</label>
+                        <input type="email" id="editClientEmail" class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label for="editClientBirthDate" class="block text-sm font-medium text-slate-300">Data de Nascimento:</label>
+                        <input type="date" id="editClientBirthDate" class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                    </div>
+                    <div class="sm:col-span-2 flex justify-end gap-2 mt-4">
+                        <button type="button" onclick="hideEditClientModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">Cancelar</button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de Seleção de Produtos -->
+        <div id="productSelectionModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-2xl">
+                <h3 class="text-2xl font-semibold text-white mb-4 text-center">Adicionar Produtos à Venda</h3>
+                <!-- Campo de pesquisa adicionado aqui -->
+                <div class="mb-4">
+                    <input type="text" id="productSearchInput" placeholder="Pesquisar produtos..." class="w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2 focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div id="productSelectionCheckboxes" class="max-h-80 overflow-y-auto mb-4 border border-slate-700 rounded-lg p-4">
+                    <!-- Produtos e inputs de quantidade, lote e valor serão inseridos aqui dinamicamente -->
+                </div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button onclick="saveSelectedProducts()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-check-circle mr-2"></i> Confirmar
+                    </button>
+                    <button onclick="hideProductSelectionModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-times-circle mr-2"></i> Fechar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Novo Modal de Edição de Texto -->
+        <div id="textEditModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-2xl">
+                <h3 class="text-2xl font-semibold text-white mb-4 text-center">Editar Texto do E-mail/PDF</h3>
+                <p class="text-slate-300 mb-4 text-center">Edite o texto abaixo. Ele será usado no corpo do e-mail e nos rodapés dos PDFs.</p>
+                
+                <!-- O editor de formatação foi substituído por uma textarea simples para garantir texto limpo -->
+                <textarea id="editableTextarea" class="w-full h-96 rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-4 border-2 resize-none overflow-y-auto focus:ring-blue-500 focus:border-blue-500"></textarea>
+                
+                <div class="flex justify-end gap-2 mt-4">
+                    <button id="saveTextBtn" onclick="saveEditableText()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-save mr-2"></i> Salvar Texto
+                    </button>
+                    <button onclick="hideTextEditModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-times-circle mr-2"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-4 py-2 rounded-lg shadow-lg hidden">
+            <p id="toast-message"></p>
+        </div>
+    </div>
+    
+    <!-- Scripts do Firebase e do Aplicativo -->
+    <script type="module">
+        // Importações do Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, collection, addDoc, updateDoc, deleteDoc, getDocs, where, query, setLogLevel, writeBatch, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Variáveis globais do ambiente Canvas
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrylctq94XX2xDMROiC23KWCYVNuLbAEQ",
+            authDomain: "vendaval-6eb23.firebaseapp.com",
+            projectId: "vendaval-6eb23",
+            storageBucket: "vendaval-6eb23.firebase-app.com",
+            messagingSenderId: "1026188233889",
+            appId: "1:1026188233889:web:3f25a06dafafa12f48f4e0",
+            measurementId: "G-PPVFR86MV6"
+        };
+        
+        // Inicialização do Firebase
+        let app, db, auth, userId;
+        let isAuthReady = false;
+        let currentSaleId = null;
+        let currentEditingClientId = null;
+        let currentEditingProductId = null; // Novo ID para o produto a ser editado
+        
+        // Guarda os produtos selecionados para uma nova venda
+        let newSaleSelectedProducts = {};
+        // Guarda os produtos selecionados para uma venda sendo editada
+        let editSaleSelectedProducts = {};
+
+        // Variável de estado para o modo de edição no modal de pagamento
+        let isEditingProductsInPaymentModal = false;
+
+        // Variável para armazenar o texto editável (agora é texto simples)
+        let editableText = `POR FAVOR CONFIRA TODOS OS DETALHES DO SEU PEDIDO
+→ Esteja ciente do(s) produto(s) que está comprando.
+Após o fechamento do pedido não há opção de desistência ou troca.
+→ Em caso de desistência, a responsabilidade em repassar o pedido para outra pessoa é do cliente.
+(OS PAGAMENTOS DEVEM SER CUMPRIDOS CONFORME CONSTA NO PEDIDO.
+EM CASO DE ATRASO HAVERÁ MULTA. Evite atrasos!)
+→ Analise as datas de pagamento para que não haja atraso.
+→ Se preferir efetuar os pagamentos antes das datas estabelecidas e valores maiores que os estipulados nas parcelas para quitar antes do prazo, fique à vontade.
+→ Em caso de desistência, você poderá repassar seu pedido para qualquer pessoa e nos informar o contato da pessoa que irá recebê-lo.
+→ Seus abadás serão entregues na semana do evento em Natal (Ponta Negra) – Hotel Happy Ponta Negra Express.
+→ Informações Complementares:
+CORES DOS ABADÁS: somente serão divulgadas no primeiro dia de entregas, na semana do evento.
+ORDEM DE APRESENTAÇÃO E HORÁRIO DAS ATRAÇÕES: só serão divulgados uma semana antes do evento.
+Desde já, muito obrigado!
+Comissário Valeriano Sousa
+(85) 99645.7713 – E-mail: souasa@uol.com.br
+Atendimento de segunda a sexta das 9h às 19h
+VendaVal Store, há 20 anos investindo na satisfação do cliente`;
+
+        async function initializeFirebase() {
+            if (Object.keys(firebaseConfig).length === 0) {
+                document.getElementById('setup-instructions').classList.remove('hidden');
+                console.error("Firebase config não fornecido. O aplicativo não funcionará corretamente.");
+                return;
+            } else {
+                document.getElementById('setup-instructions').classList.add('hidden');
+            }
+
+            try {
+                setLogLevel('debug');
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        isAuthReady = true;
+                        document.getElementById('login-section').classList.add('hidden');
+                        document.getElementById('main-content').classList.remove('hidden');
+                        document.getElementById('connection-status').classList.remove('hidden');
+                        document.getElementById('status-message').innerHTML = `Sistema Pronto! Seu ID de usuário: <span id="user-id-value" class="font-mono text-white break-all">${userId}</span>`;
+                        document.getElementById('connection-status').classList.add('bg-green-800', 'text-green-100');
+                        toggleFormButtons(true);
+                        await loadEditableText();
+                        listenToCollections();
+                    } else {
+                        isAuthReady = false;
+                        document.getElementById('main-content').classList.add('hidden');
+                        document.getElementById('login-section').classList.remove('hidden');
+                        toggleFormButtons(false);
+                    }
+                });
+                
+            } catch (e) {
+                console.error("Erro ao inicializar o Firebase:", e);
+                showToast("Erro ao conectar ao banco de dados.", 'warning');
+            }
+        }
+        
+        // --- Funções para o editor de texto rico ---
+        // A barra de ferramentas foi removida, então essas funções não são mais necessárias
+        window.formatText = (command) => {
+            // No-op
+        };
+
+        window.alignText = (command) => {
+             // No-op
+        };
+
+        window.changeColor = (color) => {
+            // No-op
+        };
+
+        // --- Funções para o texto editável ---
+        async function loadEditableText() {
+            if (!isAuthReady) return;
+            try {
+                const docRef = doc(db, `artifacts/${appId}/users/${userId}/config`, 'email-text');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    // O texto agora é salvo como texto simples no banco de dados.
+                    editableText = docSnap.data().text;
+                }
+            } catch (e) {
+                console.error("Erro ao carregar o texto editável:", e);
+                showToast("Erro ao carregar o texto editável.", 'warning');
+            }
+        }
+
+        window.openTextEditModal = () => {
+            // Agora usa o value da textarea
+            document.getElementById('editableTextarea').value = editableText;
+            document.getElementById('textEditModal').classList.remove('hidden');
+        };
+
+        window.hideTextEditModal = () => {
+            document.getElementById('textEditModal').classList.add('hidden');
+        };
+
+        window.saveEditableText = async () => {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            // Obtém o valor da textarea, que é texto simples
+            const newText = document.getElementById('editableTextarea').value;
+            try {
+                const docRef = doc(db, `artifacts/${appId}/users/${userId}/config`, 'email-text');
+                await setDoc(docRef, { text: newText });
+                editableText = newText;
+                showToast("Texto salvo com sucesso!");
+                hideTextEditModal();
+            } catch (e) {
+                console.error("Erro ao salvar o texto:", e);
+                showToast("Erro ao salvar o texto.", 'warning');
+            }
+        };
+
+        // --- Funções de Login e Logout ---
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showToast("Login bem-sucedido!");
+            } catch (e) {
+                console.error("Erro no login:", e);
+                if (e.code === 'auth/operation-not-allowed') {
+                    showToast("Erro: A autenticação por E-mail/Senha não está ativada. Por favor, ative-a nas configurações de autenticação do seu console do Firebase.", 'warning');
+                } else {
+                    showToast("Login ou senha incorretos.", 'warning');
+                }
+            }
+        });
+
+        document.getElementById('createAdminBtn').addEventListener('click', async () => {
+            const email = "admin@vendaval.com";
+            const password = "VendavalStoreasa";
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                showToast("Conta de administrador criada com sucesso!");
+            } catch (e) {
+                console.error("Erro ao criar conta:", e);
+                if (e.code === 'auth/email-already-in-use') {
+                    showToast("Este email já está em uso.", 'warning');
+                } else if (e.code === 'auth/invalid-email') {
+                    showToast("O email não é válido.", 'warning');
+                } else if (e.code === 'auth/weak-password') {
+                    showToast("A senha é muito fraca. Mínimo de 6 caracteres.", 'warning');
+                } else if (e.code === 'auth/operation-not-allowed') {
+                    showToast("Erro: A autenticação por E-mail/Senha não está ativada. Por favor, ative-a nas configurações de autenticação do seu console do Firebase.", 'warning');
+                } else {
+                    showToast("Erro ao criar conta. Verifique os dados e o console.", 'warning');
+                }
+            }
+        });
+        
+        window.logout = async () => {
+            await signOut(auth);
+            showToast("Sessão encerrada com sucesso!");
+        }
+
+        function toggleFormButtons(enable) {
+            document.querySelectorAll('.form-button').forEach(button => {
+                button.disabled = !enable;
+                if (enable) {
+                    button.classList.remove('form-disabled');
+                } else {
+                    button.classList.add('form-disabled');
+                }
+            });
+        }
+        
+        toggleFormButtons(false);
+        initializeFirebase();
+
+        // --- Funções de UI ---
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            const activeButton = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+            if (sectionId === 'vendas') {
+                updateSaleTotal('new-sale');
+            }
+        }
+        
+        showSection('dashboard');
+
+        // --- Funções do Firestore (CRUD) ---
+        let clients = [];
+        let products = [];
+        let sales = [];
+        let events = [];
+
+        function listenToCollections() {
+            if (!isAuthReady) {
+                console.warn("Autenticação não concluída. Abortando escuta de dados.");
+                return;
+            }
+
+            const clientsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/clientes`);
+            onSnapshot(clientsCollectionRef, (querySnapshot) => {
+                clients = [];
+                querySnapshot.forEach((doc) => {
+                    clients.push({ id: doc.id, ...doc.data() });
+                });
+                renderClients();
+                populateClientSelect();
+                renderBirthdays();
+            });
+
+            const productsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/produtos`);
+            onSnapshot(productsCollectionRef, (querySnapshot) => {
+                products = [];
+                querySnapshot.forEach((doc) => {
+                    products.push({ id: doc.id, ...doc.data() });
+                });
+                products.sort((a, b) => a.code - b.code);
+                renderProducts();
+                updateTotalStockValue();
+            });
+            
+            const eventsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/eventos`);
+            onSnapshot(eventsCollectionRef, (querySnapshot) => {
+                events = [];
+                querySnapshot.forEach((doc) => {
+                    events.push({ id: doc.id, ...doc.data() });
+                });
+                renderEvents();
+                populateEventSelect();
+            });
+
+            const salesCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/vendas`);
+            onSnapshot(salesCollectionRef, (querySnapshot) => {
+                sales = [];
+                querySnapshot.forEach((doc) => {
+                    sales.push({ id: doc.id, ...doc.data() });
+                });
+                renderSales();
+                updateDashboard();
+            });
+        }
+
+        async function addClient(clientData) {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            try {
+                const clientsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/clientes`);
+                await addDoc(clientsCollectionRef, clientData);
+                showToast("Cliente adicionado com sucesso!");
+            } catch (e) {
+                console.error("Erro ao adicionar cliente:", e);
+                showToast("Erro ao adicionar cliente.", 'warning');
+            }
+        }
+        
+        async function addProduct(productData) {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            try {
+                const productsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/produtos`);
+                const productsSnapshot = await getDocs(productsCollectionRef);
+                const currentCodes = productsSnapshot.docs.map(doc => doc.data().code || 0);
+                const maxCode = currentCodes.length > 0 ? Math.max(...currentCodes) : 0;
+                
+                const newProductData = {
+                    ...productData,
+                    code: maxCode + 1
+                };
+                
+                await addDoc(productsCollectionRef, newProductData);
+                showToast("Produto adicionado com sucesso!");
+            } catch (e) {
+                console.error("Erro ao adicionar produto:", e);
+                showToast("Erro ao adicionar produto.", 'warning');
+            }
+        }
+        
+        async function updateProduct(productId, productData) {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            try {
+                const productDocRef = doc(db, `artifacts/${appId}/users/${userId}/produtos`, productId);
+                await updateDoc(productDocRef, productData);
+                showToast("Produto atualizado com sucesso!");
+                hideEditProductModal();
+            } catch (e) {
+                console.error("Erro ao atualizar produto:", e);
+                showToast("Erro ao atualizar produto.", 'warning');
+            }
+        }
+
+        async function deleteProduct(productId) {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            try {
+                await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/produtos`, productId));
+                showToast("Produto deletado com sucesso!");
+            } catch (e) {
+                console.error("Erro ao deletar produto:", e);
+                showToast("Erro ao deletar produto.", 'warning');
+            }
+        }
+        
+        async function addEvent(eventData) {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            try {
+                const eventsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/eventos`);
+                await addDoc(eventsCollectionRef, eventData);
+                showToast("Evento adicionado com sucesso!");
+            } catch (e) {
+                console.error("Erro ao adicionar evento:", e);
+                showToast("Erro ao adicionar evento.", 'warning');
+            }
+        }
+
+        async function deleteEvent(eventId) {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            try {
+                await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/eventos`, eventId));
+                showToast("Evento deletado com sucesso!");
+            } catch (e) {
+                console.error("Erro ao deletar evento:", e);
+                showToast("Erro ao deletar evento.", 'warning');
+            }
+        }
+        
+        async function updateProductStockAndAddSale(saleData) {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+
+            const batch = writeBatch(db);
+
+            // 1. Atualiza o estoque dos produtos
+            const productsSold = saleData.products;
+            for (const productSold of productsSold) {
+                const productId = productSold.productId;
+                const quantitySold = productSold.quantity;
+
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    const newStock = (product.stock || 0) - quantitySold;
+                    if (newStock < 0) {
+                        showToast(`Estoque insuficiente para o produto: ${product.name}`, 'warning');
+                        return; // Aborta a operação
+                    }
+                    const productDocRef = doc(db, `artifacts/${appId}/users/${userId}/produtos`, productId);
+                    batch.update(productDocRef, { stock: newStock });
+                }
+            }
+
+            // 2. Cria a nova venda
+            const salesCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/vendas`);
+            const salesSnapshot = await getDocs(salesCollectionRef);
+            const currentYear = new Date().getFullYear();
+            
+            const lastSaleId = salesSnapshot.docs
+                .map(doc => parseInt(doc.id, 10))
+                .filter(id => id.toString().startsWith(currentYear.toString()))
+                .sort((a, b) => b - a)[0] || 0;
+            
+            let newId;
+            if (lastSaleId > 0) {
+                const lastNumber = parseInt(lastSaleId.toString().substring(4), 10);
+                newId = `${currentYear}${String(lastNumber + 1).padStart(3, '0')}`;
+            } else {
+                newId = `${currentYear}201`;
+            }
+
+            const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, newId);
+            batch.set(saleDocRef, saleData);
+
+            // 3. Commit as alterações
+            try {
+                await batch.commit();
+                showToast("Venda adicionada e estoque atualizado com sucesso!");
+            } catch (e) {
+                console.error("Erro ao adicionar venda e atualizar estoque:", e);
+                showToast("Erro ao adicionar venda e atualizar estoque.", 'warning');
+            }
+        }
+        
+        async function revertStockFromSale(saleId) {
+            const sale = sales.find(s => s.id === saleId);
+            if (!sale || !sale.products || sale.status === 'cancelado') {
+                return;
+            }
+        
+            const batch = writeBatch(db);
+            const productUpdates = {};
+        
+            sale.products.forEach(productSold => {
+                const updatedProduct = products.find(p => p.id === productSold.productId);
+                if (updatedProduct) {
+                    productUpdates[productSold.productId] = (productUpdates[productSold.productId] || 0) + productSold.quantity;
+                }
+            });
+        
+            for (const productId in productUpdates) {
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    const newStock = (product.stock || 0) + productUpdates[productId];
+                    const productDocRef = doc(db, `artifacts/${appId}/users/${userId}/produtos`, productId);
+                    batch.update(productDocRef, { stock: newStock });
+                }
+            }
+        
+            try {
+                await batch.commit();
+                showToast("Estoque da venda revertido com sucesso!");
+            } catch (e) {
+                console.error("Erro ao reverter o estoque:", e);
+                showToast("Erro ao reverter o estoque. Verifique o console.", 'warning');
+            }
+        }
+        
+        async function deleteSale(saleId) {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            try {
+                await revertStockFromSale(saleId);
+                await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/vendas`, saleId));
+                showToast("Venda deletada com sucesso! O estoque foi revertido.");
+            } catch (e) {
+                console.error("Erro ao deletar venda:", e);
+                showToast("Erro ao deletar venda.", 'warning');
+            }
+        }
+        
+        async function deleteClientAndSales(clientId) {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            try {
+                const salesQuery = query(collection(db, `artifacts/${appId}/users/${userId}/vendas`), where("clientId", "==", clientId));
+                const salesSnapshot = await getDocs(salesQuery);
+                salesSnapshot.forEach(async (saleDoc) => {
+                    await revertStockFromSale(saleDoc.id);
+                    await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/vendas`, saleDoc.id));
+                });
+
+                await deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/clientes`, clientId));
+                showToast("Cliente e suas vendas deletados com sucesso!");
+            } catch (e) {
+                console.error("Erro ao deletar cliente e vendas:", e);
+                showToast("Erro ao deletar cliente e vendas.", 'warning');
+            }
+        }
+
+        async function updateClient(clientId, clientData) {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            try {
+                const clientDocRef = doc(db, `artifacts/${appId}/users/${userId}/clientes`, clientId);
+                await updateDoc(clientDocRef, clientData);
+                showToast("Dados do cliente atualizados com sucesso!");
+                hideEditClientModal();
+            } catch (e) {
+                console.error("Erro ao atualizar cliente:", e);
+                showToast("Erro ao atualizar cliente.", 'warning');
+            }
+        }
+        
+        // --- Funções de Renderização da UI ---
+        function renderClients() {
+            const tableBody = document.getElementById('clientsTableBody');
+            tableBody.innerHTML = '';
+            clients.forEach(client => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-700 transition-colors';
+                row.innerHTML = `
+                    <td class="py-3 px-4">${client.name}</td>
+                    <td class="py-3 px-4">${client.cpf}</td>
+                    <td class="py-3 px-4">${client.phone || '-'} / ${client.email || '-'}</td>
+                    <td class="py-3 px-4">${client.emergencyContactName || '-'}</td>
+                    <td class="py-3 px-4">${client.emergencyContact || '-'}</td>
+                    <td class="py-3 px-4 text-sm flex gap-2">
+                        <button onclick="openEditClientModal('${client.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="showConfirmationModal('delete-client', '${client.id}')" class="bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function renderBirthdays() {
+            const birthdaysList = document.getElementById('birthdaysList');
+            birthdaysList.innerHTML = '';
+            const currentMonth = new Date().getMonth() + 1;
+            const currentDay = new Date().getDate();
+
+            const birthdaysThisMonth = clients.filter(client => {
+                if (!client.birthDate) return false;
+                const birthDate = new Date(client.birthDate + 'T00:00:00'); // Adiciona 'T00:00:00' para evitar problemas de fuso horário
+                return birthDate.getMonth() + 1 === currentMonth;
+            }).sort((a, b) => {
+                const dateA = new Date(a.birthDate + 'T00:00:00').getDate();
+                const dateB = new Date(b.birthDate + 'T00:00:00').getDate();
+                return dateA - dateB;
+            });
+
+            if (birthdaysThisMonth.length === 0) {
+                birthdaysList.innerHTML = '<p class="text-slate-400">Nenhum aniversariante neste mês.</p>';
+                return;
+            }
+
+            birthdaysThisMonth.forEach(client => {
+                const birthDate = new Date(client.birthDate + 'T00:00:00');
+                const birthDay = birthDate.getDate();
+                const isToday = birthDay === currentDay;
+                
+                const card = document.createElement('div');
+                card.className = `bg-slate-900 p-4 rounded-lg shadow-inner ${isToday ? 'border-2 border-yellow-500' : ''}`;
+                card.innerHTML = `
+                    <p class="text-lg font-semibold text-white">${client.name} ${isToday ? '<i class="fas fa-birthday-cake text-yellow-500 ml-2"></i>' : ''}</p>
+                    <p class="text-slate-400 text-sm">Aniversário: ${birthDay}/${currentMonth}</p>
+                    <p class="text-slate-400 text-sm">Telefone: ${client.phone || '-'}</p>
+                `;
+                birthdaysList.appendChild(card);
+            });
+        }
+        
+        function renderProducts() {
+            const tableBody = document.getElementById('productsTableBody');
+            tableBody.innerHTML = '';
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-700 transition-colors';
+                row.innerHTML = `
+                    <td class="py-3 px-4">${product.code}</td>
+                    <td class="py-3 px-4">${product.name}</td>
+                    <td class="py-3 px-4">R$ ${product.cost ? product.cost.toFixed(2).replace('.', ',') : '0,00'}</td>
+                    <td class="py-3 px-4 text-white">${product.stock || 0}</td>
+                    <td class="py-3 px-4 text-sm flex gap-2">
+                        <button onclick="addStockQuickly('${product.id}', 1)" class="bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button onclick="openEditProductModal('${product.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="showConfirmationModal('delete-product', '${product.id}')" class="bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        function renderEvents() {
+            const tableBody = document.getElementById('eventsTableBody');
+            tableBody.innerHTML = '';
+            events.forEach(event => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-700 transition-colors';
+                row.innerHTML = `
+                    <td class="py-3 px-4">${event.name}</td>
+                    <td class="py-3 px-4 text-sm flex gap-2">
+                        <button onclick="showConfirmationModal('delete-event', '${event.id}')" class="bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function populateClientSelect() {
+            const select = document.getElementById('saleClient');
+            const editClientSelect = document.getElementById('editSaleClient');
+            
+            select.innerHTML = '<option value="">Selecione um cliente</option>';
+            if (editClientSelect) {
+                editClientSelect.innerHTML = '<option value="">Selecione um cliente</option>';
+            }
+
+            clients.forEach(client => {
+                const option = document.createElement('option');
+                option.value = client.id;
+                option.textContent = client.name;
+                select.appendChild(option);
+
+                if (editClientSelect) {
+                    const editOption = option.cloneNode(true);
+                    editClientSelect.appendChild(editOption);
+                }
+            });
+        }
+        
+        function populateEventSelect() {
+            const select = document.getElementById('saleEvent');
+            
+            select.innerHTML = '<option value="">Selecione um evento</option>';
+            events.forEach(event => {
+                const option = document.createElement('option');
+                option.value = event.id;
+                option.textContent = event.name;
+                select.appendChild(option);
+            });
+        }
+
+        function populateEditEventSelect(currentEventId) {
+            const select = document.getElementById('editSaleEventSelect');
+            select.innerHTML = '<option value="">Selecione um evento</option>';
+            events.forEach(event => {
+                const option = document.createElement('option');
+                option.value = event.id;
+                option.textContent = event.name;
+                if (event.id === currentEventId) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+        }
+
+        function updateSaleTotal(mode) {
+            let total = 0;
+            const productList = mode === 'new-sale' ? newSaleSelectedProducts : editSaleSelectedProducts;
+            
+            Object.values(productList).forEach(p => {
+                const quantity = p.quantity || 0;
+                const value = p.value || 0;
+                total += quantity * value;
+            });
+
+            const displayElement = mode === 'new-sale' ? document.getElementById('saleTotalValue') : document.getElementById('editSaleTotalValue');
+            if (displayElement) {
+                if (mode === 'new-sale') {
+                     displayElement.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+                } else {
+                     displayElement.value = total.toFixed(2);
+                }
+            }
+        }
+        
+        function renderNewSaleProducts() {
+            const list = document.getElementById('newSaleProductsList');
+            list.innerHTML = '';
+            if (Object.keys(newSaleSelectedProducts).length === 0) {
+                list.innerHTML = '<p class="text-slate-400">Nenhum produto adicionado.</p>';
+                return;
+            }
+            
+            Object.keys(newSaleSelectedProducts).forEach(productId => {
+                const product = products.find(p => p.id === productId);
+                const listItem = document.createElement('div');
+                listItem.className = 'bg-slate-700 rounded-lg p-2 flex flex-col sm:flex-row justify-between items-start sm:items-center';
+                
+                const productInfo = product ? `<span class="text-white">${product.name}</span>` : `<span class="text-red-500">Produto removido (ID: ${productId})</span>`;
+
+                listItem.innerHTML = `
+                    ${productInfo}
+                    <div class="flex items-center mt-2 sm:mt-0">
+                        <label class="text-sm text-slate-400 mr-2">Qtd:</label>
+                        <input type="number" data-product-id="${productId}" data-type="quantity" value="${newSaleSelectedProducts[productId].quantity}" min="1" max="10" class="new-sale-product-quantity w-16 text-right rounded-md border-slate-600 bg-slate-900 text-white shadow-sm p-1 text-sm border-2 mr-4">
+                        <label class="text-sm text-slate-400 mr-2">Lote:</label>
+                        <input type="number" data-product-id="${productId}" data-type="lot" value="${newSaleSelectedProducts[productId].lot || ''}" min="1" max="10" class="new-sale-product-lot w-24 text-right rounded-md border-slate-600 bg-slate-900 text-white shadow-sm p-1 text-sm border-2 mr-4">
+                        <label class="text-sm text-slate-400 mr-2">Valor:</label>
+                        <input type="number" step="0.01" data-product-id="${productId}" data-type="value" value="${newSaleSelectedProducts[productId].value}" min="0.01" class="new-sale-product-value w-24 text-right rounded-md border-slate-600 bg-slate-900 text-white shadow-sm p-1 text-sm border-2">
+                        <button type="button" onclick="removeProductFromNewSale('${productId}')" class="text-red-500 hover:text-red-700 font-bold ml-2">
+                           <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(listItem);
+            });
+
+            document.querySelectorAll('#newSaleProductsList input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const productId = e.target.dataset.productId;
+                    const type = e.target.dataset.type;
+                    let value = e.target.value;
+
+                    if (type === 'quantity' || type === 'lot') {
+                        value = parseInt(value);
+                        if (isNaN(value) || value < 1) value = 1;
+                        if (value > 10) value = 10;
+                        e.target.value = value;
+                    } else if (type === 'value') {
+                        value = parseFloat(value);
+                        if (isNaN(value) || value < 0.01) value = 0.01;
+                        e.target.value = value.toFixed(2);
+                    }
+
+                    newSaleSelectedProducts[productId][type] = value;
+                    updateSaleTotal('new-sale');
+                });
+            });
+        }
+
+        window.removeProductFromNewSale = (productId) => {
+            delete newSaleSelectedProducts[productId];
+            renderNewSaleProducts();
+            updateSaleTotal('new-sale');
+        };
+        
+        function renderSales(filteredSales = sales) {
+            const tableBody = document.getElementById('salesTableBody');
+            tableBody.innerHTML = '';
+            filteredSales.forEach(sale => {
+                const client = clients.find(c => c.id === sale.clientId);
+                const clientName = client ? client.name : 'Cliente Removido';
+                const totalValue = sale.totalValue ? sale.totalValue.toFixed(2).replace('.', ',') : '0,00';
+                const createdAt = formatDateAsDDMMYYYY(sale.createdAt);
+                
+                let statusColor = '';
+                let statusText = '';
+                
+                if (sale.status === 'quitado') {
+                    statusColor = 'bg-green-600';
+                    statusText = 'Quitado';
+                } else if (sale.status === 'cancelado') {
+                    statusColor = 'bg-red-500';
+                    statusText = 'Cancelada';
+                } else {
+                    const hasOverdue = sale.parcels && sale.parcels.some(p => p.status !== 'pago' && new Date(p.dueDate) < new Date());
+                    if (hasOverdue) {
+                        statusColor = 'bg-orange-500';
+                        statusText = 'Vencida';
+                    } else {
+                        statusColor = 'bg-blue-500';
+                        statusText = 'Em Andamento';
+                    }
+                }
+
+                const productsList = (sale.products || [])
+                    .map(item => {
+                        const product = products.find(p => p.id === item.productId);
+                        const productName = product ? product.name : 'Removido';
+                        const lot = item.lot || 'N/A';
+                        return `
+                            <div class="mb-1 text-sm text-slate-300">
+                                <strong>${productName}</strong> (Qtd: ${item.quantity}, Lote: ${lot})
+                            </div>
+                        `;
+                    })
+                    .join('');
+
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-slate-700 transition-colors';
+                row.innerHTML = `
+                    <td class="py-3 px-4 text-sm font-medium text-white">${sale.id}</td>
+                    <td class="py-3 px-4 text-slate-300">${clientName}</td>
+                    <td class="py-3 px-4">${productsList}</td>
+                    <td class="py-3 px-4 text-green-500">R$ ${totalValue}</td>
+                    <td class="py-3 px-4 text-slate-300">${createdAt}</td>
+                    <td class="py-3 px-4"><span class="inline-block rounded-full px-2 py-1 text-xs font-semibold text-white ${statusColor}">${statusText}</span></td>
+                    <td class="py-3 px-4 text-sm flex gap-2">
+                        <button onclick="openPaymentModal('${sale.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-info-circle"></i>
+                        </button>
+                        <button onclick="enviarEmail('${sale.id}')" class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-envelope"></i>
+                        </button>
+                        <button onclick="visualizarPdf('${sale.id}')" class="bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-file-pdf"></i>
+                        </button>
+                        <button onclick="showConfirmationModal('cancel-sale', '${sale.id}')" class="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                        <button onclick="showConfirmationModal('delete-sale', '${sale.id}')" class="bg-red-600 hover:bg-red-600 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        document.getElementById('saleSearchInput').addEventListener('keyup', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredSales = sales.filter(s => 
+                s.id.toLowerCase().includes(searchTerm) || 
+                (clients.find(c => c.id === s.clientId)?.name || '').toLowerCase().includes(searchTerm) ||
+                (s.products || []).some(p => (products.find(pr => pr.id === p.productId)?.name || '').toLowerCase().includes(searchTerm))
+            );
+            renderSales(filteredSales);
+        });
+
+        function updateDashboard() {
+            const totalSalesCount = sales.length;
+            const clientsCount = clients.length;
+            const productsCount = products.length;
+            
+            let totalSalesValue = 0;
+            let totalReceivedValue = 0;
+            const paidSales = [];
+            const inProgressSales = [];
+            const overdueSales = [];
+            const canceledSales = [];
+
+            sales.forEach(sale => {
+                if (sale.status === 'cancelado') {
+                    canceledSales.push(sale);
+                    return;
+                }
+
+                totalSalesValue += sale.totalValue;
+                
+                sale.parcels.forEach(p => {
+                    if (p.status === 'pago') {
+                        totalReceivedValue += p.value;
+                    }
+                });
+
+                if (sale.status === 'quitado') {
+                     paidSales.push(sale);
+                } else {
+                    const hasOverdue = sale.parcels && sale.parcels.some(p => p.status !== 'pago' && new Date(p.dueDate) < new Date());
+                    if (hasOverdue) {
+                        overdueSales.push(sale);
+                    } else {
+                        inProgressSales.push(sale);
+                    }
+                }
+            });
+
+            const totalPendingValue = totalSalesValue - totalReceivedValue;
+            
+            document.getElementById('totalSalesValue').textContent = 'R$ ' + totalSalesValue.toFixed(2).replace('.', ',');
+            document.getElementById('totalReceivedValue').textContent = 'R$ ' + totalReceivedValue.toFixed(2).replace('.', ',');
+            document.getElementById('totalPendingValue').textContent = 'R$ ' + totalPendingValue.toFixed(2).replace('.', ',');
+            
+            const totalRevenue = sales.reduce((sum, s) => sum + (s.totalValue || 0), 0);
+
+            document.getElementById('totalSalesCount').textContent = totalSalesCount;
+            document.getElementById('totalRevenue').textContent = 'R$ ' + totalRevenue.toFixed(2).replace('.', ',');
+            document.getElementById('reportsTotalRevenue').textContent = 'R$ ' + totalRevenue.toFixed(2).replace('.', ',');
+            document.getElementById('paidSalesCount').textContent = paidSales.length;
+            document.getElementById('inProgressSalesCount').textContent = inProgressSales.length;
+            document.getElementById('overdueSalesCount').textContent = overdueSales.length;
+            document.getElementById('canceledSalesCount').textContent = canceledSales.length;
+            document.getElementById('pendingPaymentCount').textContent = inProgressSales.length + overdueSales.length; // Nova métrica
+            document.getElementById('totalClientsCount').textContent = clientsCount;
+            document.getElementById('totalProductsCount').textContent = productsCount;
+        }
+        
+        function updateTotalStockValue() {
+            const totalCost = products.reduce((sum, p) => sum + (p.cost || 0), 0);
+            document.getElementById('totalStockValue').textContent = `R$ ${totalCost.toFixed(2).replace('.', ',')}`;
+        }
+        
+        window.editTotalStockValue = () => {
+            const currentValue = products.reduce((sum, p) => sum + (p.cost || 0), 0);
+            const newValue = prompt("Digite o novo valor total de custo do estoque:", currentValue.toFixed(2));
+            if (newValue !== null) {
+                const newCost = parseFloat(newValue.replace(',', '.'));
+                if (!isNaN(newCost) && newCost >= 0) {
+                    showToast("Função de edição do valor total ainda não implementada para múltiplos produtos. Edite o custo de cada produto individualmente.");
+                } else {
+                    showToast("Valor inválido. Por favor, digite um número válido.", 'warning');
+                }
+            }
+        };
+
+        // --- Funções de Eventos dos Formulários ---
+        document.getElementById('clientForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const clientData = {
+                name: document.getElementById('clientName').value,
+                cpf: document.getElementById('clientCpf').value,
+                phone: document.getElementById('clientPhone').value,
+                email: document.getElementById('clientEmail').value,
+                emergencyContactName: document.getElementById('clientEmergencyContactName').value,
+                emergencyContact: document.getElementById('clientEmergencyContact').value,
+                birthDate: document.getElementById('clientBirthDate').value,
+                createdAt: new Date().toISOString()
+            };
+            await addClient(clientData);
+            e.target.reset();
+        });
+
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const productData = {
+                name: document.getElementById('productName').value,
+                cost: parseFloat(document.getElementById('productCost').value) || 0,
+                stock: parseInt(document.getElementById('productStock').value) || 0,
+                createdAt: new Date().toISOString()
+            };
+            await addProduct(productData);
+            e.target.reset();
+        });
+        
+        document.getElementById('editProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const productData = {
+                name: document.getElementById('editProductName').value,
+                cost: parseFloat(document.getElementById('editProductCost').value) || 0,
+                stock: parseInt(document.getElementById('editProductStock').value) || 0,
+            };
+            await updateProduct(currentEditingProductId, productData);
+        });
+
+        document.getElementById('eventForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const eventData = {
+                name: document.getElementById('eventName').value,
+                createdAt: new Date().toISOString()
+            };
+            await addEvent(eventData);
+            e.target.reset();
+        });
+
+        document.getElementById('salePaymentMethod').addEventListener('change', (e) => {
+            const installmentsWrapper = document.getElementById('installmentsWrapper');
+            if (e.target.value === 'pix-parcelado') {
+                installmentsWrapper.classList.remove('hidden');
+            } else {
+                installmentsWrapper.classList.add('hidden');
+            }
+        });
+        
+        document.getElementById('saleForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const clientId = document.getElementById('saleClient').value;
+            const eventId = document.getElementById('saleEvent').value;
+            const event = events.find(e => e.id === eventId);
+            const eventName = event?.name || 'Evento não encontrado';
+
+            const paymentMethod = document.getElementById('salePaymentMethod').value;
+            const installments = (paymentMethod === 'pix-parcelado') ? parseInt(document.getElementById('saleInstallments').value) : 1;
+            const totalValue = Object.values(newSaleSelectedProducts).reduce((sum, p) => sum + (p.quantity * p.value), 0);
+            
+            if (!clientId || Object.keys(newSaleSelectedProducts).length === 0) {
+                showToast("Por favor, selecione um cliente e adicione pelo menos um produto.", 'warning');
+                return;
+            }
+            if (totalValue <= 0) {
+                showToast("O valor total da venda deve ser maior que zero.", 'warning');
+                return;
+            }
+
+            // Verifica se há estoque suficiente antes de gerar a venda
+            for (const productSold of Object.values(newSaleSelectedProducts)) {
+                const productInStock = products.find(p => p.id === productSold.productId);
+
+                if (!productInStock || (productInStock.stock || 0) < productSold.quantity) {
+                    showToast(`Estoque insuficiente para o produto: ${productInStock.name}. O estoque atual é de ${productInStock.stock || 0} unidades.`, 'warning');
+                    return;
+                }
+            }
+            
+            const parcels = [];
+            const parcelValue = totalValue / installments;
+            const today = new Date();
+            
+            for (let i = 1; i <= installments; i++) {
+                const dueDate = new Date(today);
+                dueDate.setMonth(today.getMonth() + i);
+                parcels.push({
+                    parcelNumber: i,
+                    value: parcelValue,
+                    dueDate: dueDate.toISOString(),
+                    status: 'em andamento'
+                });
+            }
+            
+            const saleData = {
+                clientId,
+                eventId,
+                eventName,
+                totalValue,
+                paymentMethod,
+                installments,
+                products: Object.values(newSaleSelectedProducts),
+                parcels,
+                status: 'em andamento',
+                createdAt: new Date().toISOString()
+            };
+            
+            await updateProductStockAndAddSale(saleData);
+            e.target.reset();
+            newSaleSelectedProducts = {};
+            renderNewSaleProducts();
+            updateSaleTotal('new-sale');
+        });
+
+        // --- Funções de Modals e Confirmações Personalizadas ---
+        let currentAction, currentItemId;
+
+        function showConfirmationModal(action, itemId) {
+            currentAction = action;
+            currentItemId = itemId;
+            const modal = document.getElementById('modal');
+            const message = document.getElementById('modal-message');
+
+            if (action === 'delete-sale') {
+                message.textContent = "Tem certeza que deseja excluir esta venda? Esta ação não pode ser desfeita.";
+            } else if (action === 'delete-client') {
+                message.textContent = "Tem certeza que deseja excluir este cliente e todas as suas vendas? Esta ação não pode ser desfeita.";
+            } else if (action === 'delete-product') {
+                 message.textContent = "Tem certeza que deseja excluir este produto? Esta ação não pode ser desfeita.";
+            } else if (action === 'delete-event') {
+                message.textContent = "Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.";
+            } else if (action === 'cancel-sale') {
+                message.textContent = "Tem certeza que deseja cancelar esta venda?";
+            }
+            modal.classList.remove('hidden');
+        }
+
+        document.getElementById('modal-confirm-btn').addEventListener('click', async () => {
+            if (currentAction === 'delete-sale') {
+                await deleteSale(currentItemId);
+            } else if (currentAction === 'delete-client') {
+                await deleteClientAndSales(currentItemId);
+            } else if (currentAction === 'delete-product') {
+                await deleteProduct(currentItemId);
+            } else if (currentAction === 'delete-event') {
+                await deleteEvent(currentItemId);
+            } else if (currentAction === 'cancel-sale') {
+                try {
+                    await revertStockFromSale(currentItemId);
+                    const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, currentItemId);
+                    await updateDoc(saleDocRef, { status: 'cancelado' });
+                    showToast("Status da venda atualizado para 'Cancelado'! O estoque foi revertido.");
+                } catch (e) {
+                    console.error("Erro ao cancelar venda:", e);
+                    showToast("Erro ao cancelar venda.", 'warning');
+                }
+            }
+            document.getElementById('modal').classList.add('hidden');
+        });
+
+        document.getElementById('modal-cancel-btn').addEventListener('click', () => {
+            document.getElementById('modal').classList.add('hidden');
+        });
+        
+        window.openPaymentModal = (saleId) => {
+            currentSaleId = saleId;
+            const sale = sales.find(s => s.id === saleId);
+            if (!sale) return;
+
+            // Carrega os dados da venda para o modal de pagamento/edição
+            populateEditEventSelect(sale.eventId);
+            document.getElementById('editSaleTotalValue').value = sale.totalValue.toFixed(2);
+            document.getElementById('editSalePaymentMethod').value = sale.paymentMethod;
+            
+            // Preenche a lista de produtos na seção de edição
+            editSaleSelectedProducts = {};
+            (sale.products || []).forEach(p => {
+                editSaleSelectedProducts[p.productId] = { 
+                    ...p
+                };
+            });
+            renderEditSaleProducts();
+
+            const parcelList = document.getElementById('parcelList');
+            parcelList.innerHTML = '';
+            
+            (sale.parcels || []).forEach((parcel, index) => {
+                const item = document.createElement('div');
+                const dueDate = new Date(parcel.dueDate).toISOString().split('T')[0];
+                
+                let statusColor = '';
+                let statusText = '';
+                let buttonHtml = '';
+                const today = new Date();
+                const parcelDueDate = new Date(parcel.dueDate);
+
+                if (parcel.status === 'pago') {
+                    statusColor = 'bg-green-500';
+                    statusText = 'Pago';
+                    buttonHtml = `<button onclick="revertParcelPayment('${sale.id}', ${index})" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 ml-4">Reverter</button>`;
+                } else if (parcelDueDate < today) {
+                    statusColor = 'bg-orange-500';
+                    statusText = 'Vencida';
+                    buttonHtml = `<button onclick="markParcelAsPaid('${sale.id}', ${index})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 ml-4">Marcar como Pago</button>`;
+                } else {
+                    statusColor = 'bg-blue-500';
+                    statusText = 'Em Andamento';
+                    buttonHtml = `<button onclick="markParcelAsPaid('${sale.id}', ${index})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 ml-4">Marcar como Pago</button>`;
+                }
+                
+                item.className = 'flex flex-wrap items-center justify-between p-3 border-b border-slate-700 last:border-b-0 gap-4';
+                item.innerHTML = `
+                    <div class="flex-1 min-w-[100px]">
+                        <p class="text-sm font-medium text-white">Parcela ${parcel.parcelNumber}:</p>
+                    </div>
+                    <div class="flex-1 min-w-[120px]">
+                         <label class="block text-xs font-medium text-slate-400">Valor (R$)</label>
+                        <input type="number" step="0.01" value="${parcel.value.toFixed(2)}" class="parcel-value mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 text-sm border-2">
+                    </div>
+                    <div class="flex-1 min-w-[120px]">
+                        <label class="block text-xs font-medium text-slate-400">Vencimento</label>
+                        <input type="date" value="${dueDate}" class="parcel-due-date mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 text-sm border-2">
+                    </div>
+                    <div class="flex-1 min-w-[120px] flex items-center">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${statusColor}">
+                            ${statusText}
+                        </span>
+                        ${buttonHtml}
+                    </div>
+                `;
+                parcelList.appendChild(item);
+            });
+
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+        
+        // Função para reverter o estoque em caso de erro na edição da venda
+        async function revertStockChanges(originalProducts, updatedProducts, batch) {
+            const productUpdates = {};
+
+            // Reverte o estoque dos produtos removidos
+            originalProducts.forEach(originalProduct => {
+                const updatedProduct = updatedProducts.find(up => up.productId === originalProduct.productId);
+                if (!updatedProduct) {
+                    productUpdates[originalProduct.productId] = (productUpdates[originalProduct.productId] || 0) + originalProduct.quantity;
+                }
+            });
+
+            // Reverte o estoque dos produtos com quantidade alterada
+            updatedProducts.forEach(updatedProduct => {
+                const originalProduct = originalProducts.find(op => op.productId === updatedProduct.productId);
+                if (originalProduct && originalProduct.quantity !== updatedProduct.quantity) {
+                    productUpdates[updatedProduct.productId] = (productUpdates[updatedProduct.productId] || 0) + (originalProduct.quantity - updatedProduct.quantity);
+                }
+            });
+
+            for (const productId in productUpdates) {
+                const productRef = doc(db, `artifacts/${appId}/users/${userId}/produtos`, productId);
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    const newStock = (product.stock || 0) + productUpdates[productId];
+                    batch.update(productRef, { stock: newStock });
+                }
+            }
+
+            try {
+                await batch.commit();
+            } catch (error) {
+                console.error("Erro ao reverter o estoque:", error);
+                showToast("Erro crítico! Não foi possível reverter o estoque. Verifique o console.", 'warning');
+            }
+        }
+
+        window.saveAllChanges = async () => {
+            if (!currentSaleId) return;
+            const sale = sales.find(s => s.id === currentSaleId);
+            if (!sale) return;
+
+            const batch = writeBatch(db);
+
+            // 1. Coleta os dados novos e originais para comparação
+            const originalProducts = sale.products || [];
+            const updatedProducts = Object.values(editSaleSelectedProducts).filter(p => parseFloat(p.quantity) > 0 && parseFloat(p.value) > 0);
+            
+            // 2. Compara as listas e calcula as diferenças de estoque
+            const stockUpdates = {};
+
+            // Produtos removidos ou com quantidade diminuída
+            originalProducts.forEach(originalProduct => {
+                const updatedProduct = updatedProducts.find(up => up.productId === originalProduct.productId);
+                if (!updatedProduct) {
+                    // Produto removido da venda
+                    stockUpdates[originalProduct.productId] = (stockUpdates[originalProduct.productId] || 0) + originalProduct.quantity;
+                } else if (updatedProduct.quantity < originalProduct.quantity) {
+                    // Quantidade diminuída
+                    stockUpdates[originalProduct.productId] = (stockUpdates[originalProduct.productId] || 0) + (originalProduct.quantity - updatedProduct.quantity);
+                }
+            });
+
+            // Produtos adicionados ou com quantidade aumentada
+            updatedProducts.forEach(updatedProduct => {
+                const originalProduct = originalProducts.find(op => op.productId === updatedProduct.productId);
+                if (!originalProduct) {
+                    // Novo produto adicionado
+                    stockUpdates[updatedProduct.productId] = (stockUpdates[updatedProduct.productId] || 0) - updatedProduct.quantity;
+                } else if (updatedProduct.quantity > originalProduct.quantity) {
+                    // Quantidade aumentada
+                    stockUpdates[updatedProduct.productId] = (stockUpdates[updatedProduct.productId] || 0) - (updatedProduct.quantity - originalProduct.quantity);
+                }
+            });
+
+            // 3. Verifica se há estoque suficiente para as alterações
+            const currentStockState = {};
+            products.forEach(p => {
+                currentStockState[p.id] = p.stock;
+            });
+            
+            for (const productId in stockUpdates) {
+                const stockChange = stockUpdates[productId];
+                const product = products.find(p => p.id === productId);
+                if (product) {
+                    const newStock = (product.stock || 0) + stockChange;
+                    if (newStock < 0) {
+                        showToast(`Estoque insuficiente para a edição do produto: ${product.name}. A operação foi cancelada.`, 'warning');
+                        return; // Aborta a operação
+                    }
+                    const productDocRef = doc(db, `artifacts/${appId}/users/${userId}/produtos`, productId);
+                    batch.update(productDocRef, { stock: newStock });
+                }
+            }
+
+            // 4. Salva as outras alterações da venda
+            const newEventId = document.getElementById('editSaleEventSelect').value;
+            const newEvent = events.find(e => e.id === newEventId);
+            const newEventName = newEvent ? newEvent.name : 'Evento não encontrado';
+            
+            const updatedParcels = [];
+            document.querySelectorAll('#parcelList > div').forEach((item, index) => {
+                const value = parseFloat(item.querySelector('.parcel-value').value);
+                const dueDate = item.querySelector('.parcel-due-date').value;
+                if(isNaN(value) || value <= 0) {
+                    showToast('O valor da parcela deve ser um número válido e maior que zero.', 'warning');
+                    return; // Retorna e não salva as alterações
+                }
+
+                updatedParcels.push({
+                    parcelNumber: index + 1,
+                    value: value,
+                    status: sale.parcels[index].status,
+                    dueDate: dueDate
+                });
+            });
+
+            const newTotalValue = updatedParcels.reduce((sum, p) => sum + p.value, 0);
+
+            const newPaymentMethod = document.getElementById('editSalePaymentMethod').value;
+            
+            const updatedSaleData = {
+                ...sale,
+                eventId: newEventId,
+                eventName: newEventName,
+                totalValue: newTotalValue,
+                paymentMethod: newPaymentMethod,
+                parcels: updatedParcels,
+                products: updatedProducts,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, currentSaleId);
+            batch.update(saleDocRef, updatedSaleData);
+
+            // 5. Commit as alterações
+            try {
+                await batch.commit();
+                showToast("Venda atualizada e estoque ajustado com sucesso!");
+                window.hidePaymentModal();
+            } catch (e) {
+                console.error("Erro ao salvar as alterações:", e);
+                showToast("Erro ao salvar as alterações.", 'warning');
+                // Em caso de falha no commit, o ideal seria reverter as alterações de estoque, mas o Firestore não suporta rollbacks
+            }
+        };
+        
+        window.saveAndSendEmail = async () => {
+            if (!currentSaleId) return;
+            const success = await saveAllChanges();
+            if (success) {
+                enviarEmail(currentSaleId);
+            }
+        };
+        
+        window.saveAndVisualizarPdf = async () => {
+            if (!currentSaleId) return;
+            const success = await saveAllChanges();
+            if (success) {
+                visualizarPdf(currentSaleId);
+            }
+        };
+
+        window.hidePaymentModal = () => {
+            document.getElementById('paymentModal').classList.add('hidden');
+        }
+        
+        // Função para verificar e atualizar o status da venda para 'quitado'
+        async function checkIfSaleIsPaid(saleId) {
+            const sale = sales.find(s => s.id === saleId);
+            if (!sale) return;
+
+            const allPaid = (sale.parcels || []).every(p => p.status === 'pago');
+            if (allPaid && sale.status !== 'quitado') {
+                try {
+                    const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, saleId);
+                    await updateDoc(saleDocRef, { status: 'quitado' });
+                    showToast("Venda quitada com sucesso!");
+                } catch (e) {
+                    console.error("Erro ao atualizar status para 'quitado':", e);
+                    showToast("Erro ao atualizar status da venda.", 'warning');
+                }
+            }
+        }
+
+        window.markParcelAsPaid = async (saleId, parcelIndex) => {
+            const sale = sales.find(s => s.id === saleId);
+            if (!sale) return;
+
+            const updatedParcels = [...(sale.parcels || [])];
+            if (updatedParcels[parcelIndex].status === 'em andamento' || updatedParcels[parcelIndex].status === 'vencido') {
+                updatedParcels[parcelIndex].status = 'pago';
+                try {
+                    const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, saleId);
+                    await updateDoc(saleDocRef, { parcels: updatedParcels });
+                    showToast("Parcela marcada como paga!");
+                    checkIfSaleIsPaid(saleId);
+                    window.openPaymentModal(saleId);
+                } catch (e) {
+                    console.error("Erro ao marcar parcela como paga:", e);
+                    showToast("Erro ao marcar parcela como paga.", 'warning');
+                }
+            }
+        };
+        
+        window.revertParcelPayment = async (saleId, parcelIndex) => {
+            const sale = sales.find(s => s.id === saleId);
+            if (!sale) return;
+
+            const updatedParcels = [...(sale.parcels || [])];
+            if (updatedParcels[parcelIndex].status === 'pago') {
+                updatedParcels[parcelIndex].status = 'em andamento';
+                try {
+                    const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, saleId);
+                    await updateDoc(saleDocRef, { parcels: updatedParcels, status: 'em andamento' });
+                    showToast("Pagamento da parcela revertido!");
+                    window.openPaymentModal(saleId);
+                } catch (e) {
+                    console.error("Erro ao reverter o pagamento da parcela:", e);
+                    showToast("Erro ao reverter o pagamento da parcela.", 'warning');
+                }
+            }
+        };
+
+        // --- Funções de Edição de Cliente ---
+        window.openEditClientModal = (clientId) => {
+            const client = clients.find(c => c.id === clientId);
+            if (!client) {
+                showToast("Cliente não encontrado.", 'warning');
+                return;
+            }
+            
+            currentEditingClientId = clientId;
+            document.getElementById('editClientName').value = client.name;
+            document.getElementById('editClientCpf').value = client.cpf;
+            document.getElementById('editClientPhone').value = client.phone || '';
+            document.getElementById('editClientEmail').value = client.email || '';
+            document.getElementById('editClientEmergencyContactName').value = client.emergencyContactName || '';
+            document.getElementById('editClientEmergencyContact').value = client.emergencyContact || '';
+            document.getElementById('editClientBirthDate').value = client.birthDate || '';
+            
+            document.getElementById('editClientModal').classList.remove('hidden');
+        };
+
+        window.hideEditClientModal = () => {
+            document.getElementById('editClientModal').classList.add('hidden');
+            currentEditingClientId = null;
+        };
+
+        document.getElementById('editClientForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const clientData = {
+                name: document.getElementById('editClientName').value,
+                cpf: document.getElementById('editClientCpf').value,
+                phone: document.getElementById('editClientPhone').value,
+                email: document.getElementById('editClientEmail').value,
+                emergencyContactName: document.getElementById('editClientEmergencyContactName').value,
+                emergencyContact: document.getElementById('editClientEmergencyContact').value,
+                birthDate: document.getElementById('editClientBirthDate').value
+            };
+            await updateClient(currentEditingClientId, clientData);
+        });
+        
+        window.addStockQuickly = async (productId, quantity) => {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            try {
+                const newStock = (product.stock || 0) + quantity;
+                const productDocRef = doc(db, `artifacts/${appId}/users/${userId}/produtos`, productId);
+                await updateDoc(productDocRef, { stock: newStock });
+                showToast(`${quantity} unidade(s) adicionada(s) ao estoque de ${product.name}!`);
+            } catch (e) {
+                console.error("Erro ao adicionar estoque:", e);
+                showToast("Erro ao adicionar estoque.", 'warning');
+            }
+        }
+
+        function renderEditSaleProducts() {
+            const list = document.getElementById('editSaleProductsList');
+            list.innerHTML = '';
+            if (Object.keys(editSaleSelectedProducts).length === 0) {
+                list.innerHTML = '<li class="text-slate-400">Nenhum produto adicionado.</li>';
+                return;
+            }
+            
+            // Adiciona o cabeçalho
+            const header = document.createElement('li');
+            header.className = 'bg-slate-700 rounded-lg p-2 flex justify-between items-center font-semibold text-xs text-white uppercase';
+            header.innerHTML = `
+                <span>Nome do Produto</span>
+                <div class="flex space-x-2 items-center">
+                    <span class="w-16 text-center">Qtd</span>
+                    <span class="w-20 text-center">Lote</span>
+                    <span class="w-20 text-center">Valor (R$)</span>
+                </div>
+            `;
+            list.appendChild(header);
+
+            Object.keys(editSaleSelectedProducts).forEach(productId => {
+                const product = products.find(p => p.id === productId);
+                const listItem = document.createElement('li');
+                listItem.className = 'bg-slate-800 rounded-lg p-2 flex flex-col sm:flex-row justify-between items-start sm:items-center';
+                
+                const productInfo = product ? `<span class="text-white">${product.name}</span>` : `<span class="text-red-500">Produto removido (ID: ${productId})</span>`;
+
+                listItem.innerHTML = `
+                    ${productInfo}
+                    <div class="flex items-center mt-2 sm:mt-0">
+                        <label class="text-sm text-slate-400 mr-2">Qtd:</label>
+                        <input type="number" data-product-id="${productId}" data-type="quantity" value="${editSaleSelectedProducts[productId].quantity}" min="1" max="10" class="edit-sale-product-quantity w-16 text-right rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-1 text-sm border-2 mr-4">
+                        <label class="text-sm text-slate-400 mr-2">Lote:</label>
+                        <input type="number" data-product-id="${productId}" data-type="lot" value="${editSaleSelectedProducts[productId].lot || ''}" min="1" max="10" class="edit-sale-product-lot w-24 text-right rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-1 text-sm border-2 mr-4">
+                        <label class="text-sm text-slate-400 mr-2">Valor:</label>
+                        <input type="number" step="0.01" data-product-id="${productId}" data-type="value" value="${editSaleSelectedProducts[productId].value}" min="0.01" class="edit-sale-product-value w-24 text-right rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-1 text-sm border-2">
+                        <button type="button" onclick="removeProductFromEditSale('${productId}')" class="text-red-500 hover:text-red-700 font-bold ml-2">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(listItem);
+            });
+
+            document.querySelectorAll('#editSaleProductsList input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const productId = e.target.dataset.productId;
+                    const type = e.target.dataset.type;
+                    let value = e.target.value;
+
+                    if (type === 'quantity' || type === 'lot') {
+                        value = parseInt(value);
+                        if (isNaN(value) || value < 1) value = 1;
+                        if (value > 10) value = 10;
+                        e.target.value = value;
+                    } else if (type === 'value') {
+                        value = parseFloat(value);
+                        if (isNaN(value) || value < 0.01) value = 0.01;
+                        e.target.value = value.toFixed(2);
+                    }
+
+                    editSaleSelectedProducts[productId][type] = value;
+                    updateSaleTotal('edit-sale');
+                });
+            });
+        }
+
+        window.removeProductFromEditSale = (productId) => {
+            delete editSaleSelectedProducts[productId];
+            renderEditSaleProducts();
+            updateSaleTotal('edit-sale');
+        };
+        
+        window.openEditProductModal = (productId) => {
+            const product = products.find(p => p.id === productId);
+            if (!product) {
+                showToast("Produto não encontrado.", 'warning');
+                return;
+            }
+            
+            currentEditingProductId = productId;
+            document.getElementById('editProductName').value = product.name;
+            document.getElementById('editProductCost').value = product.cost.toFixed(2);
+            document.getElementById('editProductStock').value = product.stock;
+            
+            document.getElementById('editProductModal').classList.remove('hidden');
+        };
+
+        window.hideEditProductModal = () => {
+            document.getElementById('editProductModal').classList.add('hidden');
+            currentEditingProductId = null;
+        };
+
+
+        // --- Funções de Seleção de Produtos ---
+        window.openProductSelectionModal = (mode) => {
+            isEditingProductsInPaymentModal = (mode === 'edit-sale');
+            
+            const container = document.getElementById('productSelectionCheckboxes');
+            container.innerHTML = '';
+
+            const productSearchInput = document.getElementById('productSearchInput');
+            productSearchInput.value = ''; // Limpa o campo de pesquisa ao abrir o modal
+            
+            // Adiciona o cabeçalho
+            const header = document.createElement('div');
+            header.className = 'flex justify-between items-center py-2 border-b-2 font-semibold text-white';
+            header.innerHTML = `
+                <span>Produto</span>
+                <div class="flex space-x-2 items-center">
+                    <span class="w-16 text-center">Qtd</span>
+                    <span class="w-20 text-center">Lote</span>
+                    <span class="w-20 text-center">Valor (R$)</span>
+                </div>
+            `;
+            container.appendChild(header);
+
+            const renderProductsToSelect = (filteredProducts) => {
+                container.innerHTML = '';
+                container.appendChild(header);
+                
+                filteredProducts.forEach(product => {
+                    const currentProducts = isEditingProductsInPaymentModal ? editSaleSelectedProducts : newSaleSelectedProducts;
+                    const productData = currentProducts[product.id] || { quantity: 0, lot: null, value: 0 };
+                    
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center py-2 border-b last:border-b-0';
+                    div.innerHTML = `
+                        <span class="text-slate-300">Código ${product.code} - ${product.name}</span>
+                        <div class="flex space-x-2">
+                            <input type="number" data-product-id="${product.id}" data-type="quantity" value="${productData.quantity}" min="1" max="10" class="product-selection-input w-16 text-center rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-1 text-sm border-2">
+                            <input type="number" data-product-id="${productId}" data-type="lot" value="${productData.lot || ''}" min="1" max="10" class="product-selection-input w-20 text-center rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-1 text-sm border-2">
+                            <input type="number" step="0.01" data-product-id="${product.id}" data-type="value" value="${productData.value}" min="0.01" class="product-selection-input w-20 text-center rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-1 text-sm border-2">
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+
+                 // Re-adiciona os event listeners aos inputs renderizados
+                document.querySelectorAll('#productSelectionCheckboxes input').forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        const productId = e.target.dataset.productId;
+                        const type = e.target.dataset.type;
+                        let value = e.target.value;
+
+                        if (type === 'quantity' || type === 'lot') {
+                            value = parseInt(value);
+                            if (isNaN(value) || value < 1) value = 1;
+                            if (value > 10) value = 10;
+                            e.target.value = value;
+                        } else if (type === 'value') {
+                            value = parseFloat(value);
+                            if (isNaN(value) || value < 0.01) value = 0.01;
+                            e.target.value = value.toFixed(2);
+                        }
+
+                        const currentProducts = isEditingProductsInPaymentModal ? editSaleSelectedProducts : newSaleSelectedProducts;
+                        if (!currentProducts[productId]) {
+                             currentProducts[productId] = { productId, quantity: 0, lot: null, value: 0 };
+                        }
+                        currentProducts[productId][type] = value;
+                    });
+                });
+            };
+
+            // Adiciona o event listener de pesquisa
+            productSearchInput.addEventListener('keyup', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredProducts = products.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm) || 
+                    p.code.toString().includes(searchTerm)
+                );
+                renderProductsToSelect(filteredProducts);
+            });
+            
+            // Renderiza todos os produtos inicialmente
+            renderProductsToSelect(products);
+
+            document.getElementById('productSelectionModal').classList.remove('hidden');
+        };
+
+        window.hideProductSelectionModal = () => {
+            document.getElementById('productSelectionModal').classList.add('hidden');
+        };
+
+        window.saveSelectedProducts = () => {
+            const tempProducts = {};
+            document.querySelectorAll('#productSelectionCheckboxes .product-selection-input').forEach(input => {
+                const productId = input.dataset.productId;
+                const type = input.dataset.type;
+                let value = input.value;
+                const product = products.find(p => p.id === productId);
+
+                if (!tempProducts[productId]) {
+                    tempProducts[productId] = { productId, quantity: 0, lot: null, value: 0 };
+                }
+                
+                // Trata a conversão de tipo apenas para campos numéricos
+                if (type === 'quantity' || type === 'lot') {
+                    const parsedValue = parseInt(value);
+                    tempProducts[productId][type] = isNaN(parsedValue) ? 0 : parsedValue;
+                } else if (type === 'value') {
+                    const parsedValue = parseFloat(value);
+                    tempProducts[productId][type] = isNaN(parsedValue) ? 0 : parsedValue;
+                }
+            });
+
+            const validatedProducts = {};
+            for (const productId in tempProducts) {
+                const p = tempProducts[productId];
+                if (p.quantity >= 1 && p.quantity <= 10 && p.value > 0) {
+                    validatedProducts[productId] = {
+                        productId: p.productId,
+                        quantity: p.quantity,
+                        lot: p.lot || null,
+                        value: p.value
+                    };
+                }
+            }
+            
+            if (isEditingProductsInPaymentModal) {
+                editSaleSelectedProducts = validatedProducts;
+                renderEditSaleProducts();
+                updateSaleTotal('edit-sale');
+            } else {
+                newSaleSelectedProducts = validatedProducts;
+                renderNewSaleProducts();
+                updateSaleTotal('new-sale');
+            }
+            
+            showToast(`Produtos para a venda salvos temporariamente.`);
+            hideProductSelectionModal();
+        };
+
+        // --- Funções de formatação de data para evitar problemas de fuso horário ---
+        function formatDateAsDDMMYYYY(isoString) {
+            const date = new Date(isoString);
+            const day = String(date.getUTCDate()).padStart(2, '0');
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const year = date.getUTCFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        // --- FUNÇÃO ATUALIZADA PARA USAR MAILTO: ---
+        function enviarEmail(saleId) {
+            const sale = sales.find(s => s.id === saleId);
+            if (!sale) {
+                showToast("Venda não encontrada.", 'warning');
+                return;
+            }
+            
+            const client = clients.find(c => c.id === sale.clientId);
+            if (!client || !client.email) {
+                showToast("E-mail do cliente não encontrado.", 'warning');
+                return;
+            }
+            
+            const totalValue = sale.totalValue.toFixed(2).replace('.', ',');
+            const productsList = (sale.products || []).map(item => {
+                const product = products.find(p => p.id === item.productId);
+                const productName = product ? product.name : 'Produto Removido';
+                const lot = item.lot ? ` (Lote: ${item.lot})` : '';
+                return `- ${productName} (Qtd: ${item.quantity})${lot}`;
+            }).join('\n');
+            
+            const parcelDetails = (sale.parcels || []).map(p => `- Parcela ${p.parcelNumber}: R$ ${p.value.toFixed(2).replace('.', ',')} (Vencimento: ${formatDateAsDDMMYYYY(p.dueDate)}) - Status: ${p.status}`).join('\n');
+            
+            const to = client.email;
+            const subject = `Comprovante de Pedido #${sale.id} - VendavalStore`;
+            
+            // O texto editável agora é texto simples, sem HTML
+            const body = `
+Olá, ${client.name}!
+
+Aqui estão os detalhes do seu pedido Nº ID #${sale.id}: na Vendaval Store,
+
+Valor Total: R$ ${totalValue}
+Forma de Pagamento: ${sale.paymentMethod}
+Evento: ${sale.eventName}
+
+Produtos:
+${productsList}
+
+Parcelas:
+${parcelDetails}
+
+---
+${editableText}
+            `;
+
+            const url = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            window.location.href = url;
+            showToast("Abrindo o seu cliente de e-mail com os dados preenchidos.");
+        }
+        
+        // --- FIM DA FUNÇÃO ATUALIZADA ---
+
+        // Função para visualizar um PDF no navegador
+        window.visualizarPdf = (saleId) => {
+            const sale = sales.find(s => s.id === saleId);
+            if (!sale) return;
+            const client = clients.find(c => c.id === sale.clientId);
+            
+            const totalValue = sale.totalValue || 0;
+
+            const productsText = (sale.products || []).map(item => {
+                const product = products.find(p => p.id === item.productId);
+                const productName = product ? product.name : 'Produto Removido';
+                const lotText = item.lot ? `Lote: ${item.lot}` : 'N/A';
+                const totalItemValue = (item.quantity * item.value).toFixed(2).replace('.', ',');
+                return `<div class="parcel-item">- ${productName} (Qtd: ${item.quantity}, ${lotText}, Valor: R$ ${item.value.toFixed(2).replace('.', ',')}) - Total: R$ ${totalItemValue}</div>`;
+            }).join('');
+            
+            // Converte o texto simples com quebras de linha para HTML com <br>
+            const formattedEditableText = editableText.replace(/\n/g, '<br>');
+
+            const content = `
+                <style>
+                    body { font-family: 'Inter', sans-serif; margin: 2rem; background-color: #f3f4f6; color: #1e293b; }
+                    .header { text-align: center; margin-bottom: 2rem; }
+                    .header h1 { font-size: 2rem; font-weight: bold; }
+                    .info { margin-bottom: 1rem; }
+                    .info span { font-weight: bold; }
+                    .parcels-list { margin-top: 1rem; }
+                    .parcel-item { margin-bottom: 0.5rem; }
+                    .footer { text-align: center; margin-top: 3rem; }
+                    .important-text { font-weight: bold; }
+                    .editable-text-container { margin-top: 20px; }
+                </style>
+                <div class="header">
+                    <h1>Confirmação de Pedido - VendavalStore</h1>
+                </div>
+                <div class="info">
+                    <p><span>Pedido ID:</span> ${sale.id}</p>
+                    <p><span>Data:</span> ${formatDateAsDDMMYYYY(sale.createdAt)}</p>
+                    <p><span>Cliente:</span> ${client ? client.name : 'Removido'}</p>
+                    <p><span>CPF:</span> ${client ? client.cpf : 'N/A'}</p>
+                    <p><span>Email:</span> ${client ? client.email : 'N/A'}</p>
+                </div>
+                <div class="info">
+                    <p><span>Evento:</span> ${sale.eventName}</p>
+                    <p><span>Valor Total:</span> R$ ${totalValue.toFixed(2).replace('.', ',')}</p>
+                    <p><span>Forma de Pagamento:</span> ${sale.paymentMethod}</p>
+                </div>
+                <div class="parcels-list">
+                    <p><span>Produtos:</span></p>
+                    ${productsText}
+                </div>
+                <div class="parcels-list">
+                    <p><span>Parcelas:</span></p>
+                    ${(sale.parcels || []).map(p => `<div class="parcel-item">- Parcela ${p.parcelNumber}: R$ ${p.value.toFixed(2).replace('.', ',')} (Vencimento: ${formatDateAsDDMMYYYY(p.dueDate)}) - <strong>Status:</strong> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</div>`).join('')}
+                </div>
+                <div class="editable-text-container">
+                    ${formattedEditableText}
+                </div>
+            `;
+            const pdfWindow = window.open('', '_blank');
+            pdfWindow.document.write(content);
+            pdfWindow.document.close();
+            pdfWindow.print();
+            showToast("Visualizando comprovante de PDF...");
+        };
+
+        // --- Funções de Backup e Restauro ---
+        window.showBackupModal = () => {
+            document.getElementById('backupModal').classList.remove('hidden');
+        };
+
+        window.hideBackupModal = () => {
+            document.getElementById('backupModal').classList.add('hidden');
+        };
+
+        window.downloadBackup = async () => {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            try {
+                const clientsSnapshot = await getDocs(collection(db, `artifacts/${appId}/users/${userId}/clientes`));
+                const productsSnapshot = await getDocs(collection(db, `artifacts/${appId}/users/${userId}/produtos`));
+                const salesSnapshot = await getDocs(collection(db, `artifacts/${appId}/users/${userId}/vendas`));
+
+                const backupData = {
+                    clients: clientsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
+                    products: productsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
+                    sales: salesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                };
+
+                const backupJson = JSON.stringify(backupData, null, 2);
+                const blob = new Blob([backupJson], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `vendavalstore_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast("Backup baixado com sucesso!");
+                hideBackupModal();
+            } catch (e) {
+                console.error("Erro ao baixar backup:", e);
+                showToast("Erro ao baixar backup.", 'warning');
+            }
+        };
+
+        document.getElementById('restore-file').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const text = event.target.result;
+                try {
+                    const backupData = JSON.parse(text);
+                    if (backupData.clients && backupData.products && backupData.sales) {
+                        if (window.confirm("Atenção: A restauração irá apagar todos os seus dados atuais e substituí-los pelo backup. Deseja continuar?")) {
+                             await restoreBackup(backupData);
+                        } else {
+                            showToast("Restauração cancelada.", 'info');
+                        }
+                    } else {
+                        showToast("Ficheiro de backup inválido. Verifique o formato.", 'warning');
+                    }
+                } catch (e) {
+                    console.error("Erro ao carregar ficheiro de backup:", e);
+                    showToast("Erro ao carregar ficheiro. Verifique se é um ficheiro JSON válido.", 'warning');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        async function restoreBackup(backupData) {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+            try {
+                showToast("A restaurar dados... Por favor, não feche a página.");
+                
+                const batch = writeBatch(db);
+
+                const clearCollection = async (collectionName) => {
+                    const colRef = collection(db, `artifacts/${appId}/users/${userId}/${collectionName}`);
+                    const snapshot = await getDocs(colRef);
+                    snapshot.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                };
+                
+                await clearCollection('clientes');
+                await clearCollection('produtos');
+                await clearCollection('vendas');
+
+                backupData.clients.forEach(client => {
+                    const docRef = doc(db, `artifacts/${appId}/users/${userId}/clientes`, client.id);
+                    batch.set(docRef, client);
+                });
+                backupData.products.forEach(product => {
+                    const docRef = doc(db, `artifacts/${appId}/users/${userId}/produtos`, product.id);
+                    batch.set(docRef, product);
+                });
+                backupData.sales.forEach(sale => {
+                    const docRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, sale.id);
+                    batch.set(docRef, sale);
+                });
+
+                await batch.commit();
+                showToast("Dados restaurados com sucesso! A aplicação será atualizada.");
+                hideBackupModal();
+            } catch (e) {
+                console.error("Erro ao restaurar dados:", e);
+                showToast("Erro ao restaurar dados.", 'warning');
+            }
+        }
+
+        window.downloadDetailedReport = async (format) => {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+
+            showToast("A gerar o relatório... Por favor, aguarde.");
+
+            const clientsData = clients;
+            const productsData = products;
+            const salesData = sales;
+            
+            const paidSales = sales.filter(sale => sale.status === 'quitado');
+            const inProgressSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && !sale.parcels.some(p => new Date(p.dueDate) < new Date()));
+            const overdueSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && sale.parcels.some(p => new Date(p.dueDate) < new Date()));
+            const canceledSales = sales.filter(sale => sale.status === 'cancelado');
+            const pendingPaymentCount = inProgressSales.length + overdueSales.length;
+
+            const detailedReport = {
+                metadata: {
+                    dataGeracao: new Date().toLocaleString('pt-BR'),
+                    totalClientes: clientsData.length,
+                    totalProdutos: productsData.length,
+                    totalVendas: salesData.length,
+                    faturamentoTotal: salesData.reduce((sum, s) => sum + (s.totalValue || 0), 0),
+                    vendasPagas: paidSales.length,
+                    vendasEmAndamento: inProgressSales.length,
+                    vendasVencidas: overdueSales.length,
+                    vendasFaltandoPagar: pendingPaymentCount,
+                    vendasCanceladas: canceledSales.length
+                },
+                clientes: clientsData,
+                produtos: productsData,
+                vendas: salesData.map(sale => {
+                    const client = clientsData.find(c => c.id === sale.clientId);
+                    const clientName = client ? client.name : 'Cliente Removido';
+
+                    const detailedProducts = (sale.products || []).map(item => {
+                        const selectedProduct = productsData.find(p => p.id === item.productId);
+                        return {
+                            produto: selectedProduct ? selectedProduct.name : 'Produto Removido',
+                            codigo: selectedProduct ? selectedProduct.code : 'N/A',
+                            quantidade: item.quantity,
+                            lote: item.lot || 'N/A',
+                            valorUnitario: item.value,
+                            valorTotalItem: item.quantity * item.value
+                        };
+                    });
+                    
+                    return {
+                        id: sale.id,
+                        cliente: clientName,
+                        evento: sale.eventName,
+                        valorTotal: sale.totalValue,
+                        dataVenda: new Date(sale.createdAt).toLocaleString('pt-BR'),
+                        produtosDetalhado: detailedProducts,
+                        parcelas: sale.parcels
+                    };
+                })
+            };
+
+            if (format === 'json') {
+                const reportJson = JSON.stringify(detailedReport, null, 2);
+                const blob = new Blob([reportJson], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `relatorio_vendavalstore_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast("Relatório JSON baixado com sucesso!");
+            } else if (format === 'pdf') {
+                const pdfContent = `
+                    <style>
+                        body { font-family: 'Inter', sans-serif; margin: 2rem; background-color: #f3f4f6; color: #1e293b; }
+                        h1, h2, h3 { color: #1f2937; }
+                        .header, .section { margin-bottom: 2rem; }
+                        .header h1 { font-size: 2rem; font-weight: bold; text-align: center; }
+                        .section-title { font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+                        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+                        .stat-card { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; }
+                        .table-container { margin-top: 1rem; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; }
+                        th { background-color: #f3f4f6; font-size: 0.75rem; color: #4b5563; text-transform: uppercase; }
+                        .client-info p, .product-info p, .sale-info p { margin: 0.25rem 0; }
+                    </style>
+                    <div class="header">
+                        <h1>Relatório Detalhado - VendavalStore</h1>
+                        <p>Gerado em: ${detailedReport.metadata.dataGeracao}</p>
+                    </div>
+                    <div class="section">
+                        <h2 class="section-title">Resumo Financeiro</h2>
+                        <div class="stat-grid">
+                            <div class="stat-card"><strong>Faturamento Total:</strong> R$ ${detailedReport.metadata.faturamentoTotal.toFixed(2).replace('.', ',')}</div>
+                            <div class="stat-card"><strong>Vendas Pagas:</strong> ${detailedReport.metadata.vendasPagas}</div>
+                            <div class="stat-card"><strong>Vendas em Andamento:</strong> ${detailedReport.metadata.vendasEmAndamento}</div>
+                            <div class="stat-card"><strong>Vendas Vencidas:</strong> ${detailedReport.metadata.vendasVencidas}</div>
+                            <div class="stat-card"><strong>Vendas Faltando a Pagar:</strong> ${detailedReport.metadata.vendasFaltandoPagar}</div>
+                            <div class="stat-card"><strong>Vendas Canceladas:</strong> ${detailedReport.metadata.vendasCanceladas}</div>
+                            <div class="stat-card"><strong>Total de Clientes:</strong> ${detailedReport.metadata.totalClientes}</div>
+                            <div class="stat-card"><strong>Total de Produtos:</strong> ${detailedReport.metadata.totalProdutos}</div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <h2 class="section-title">Detalhamento de Clientes</h2>
+                        ${detailedReport.clientes.map(cliente => `
+                            <div class="client-info" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
+                                <h3>Cliente: ${cliente.name}</h3>
+                                <p><strong>CPF:</strong> ${cliente.cpf}</p>
+                                <p><strong>Contato:</strong> ${cliente.phone} / ${cliente.email}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="section">
+                        <h2 class="section-title">Detalhamento de Produtos</h2>
+                        ${detailedReport.produtos.map(produto => `
+                            <div class="product-info" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
+                                <h3>Produto: ${produto.name}</h3>
+                                <p><strong>Código:</strong> ${produto.code}</p>
+                                <p><strong>Custo:</strong> R$ ${produto.cost.toFixed(2).replace('.', ',')}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="section">
+                        <h2 class="section-title">Detalhamento de Vendas</h2>
+                        ${detailedReport.vendas.map(sale => `
+                            <div class="sale-info" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
+                                <h3>Venda ID: ${sale.id}</h3>
+                                <p><strong>Cliente:</strong> ${sale.cliente}</p>
+                                <p><strong>Data:</strong> ${sale.dataVenda}</p>
+                                <p><strong>Evento:</strong> ${sale.evento}</p>
+                                <p><strong>Valor Total:</strong> R$ ${sale.valorTotal.toFixed(2).replace('.', ',')}</p>
+                                <p><strong>Produtos:</strong></p>
+                                <ul>
+                                    ${sale.produtosDetalhado.map(p => `<li>${p.quantidade}x ${p.produto} - Lote: ${p.lote} - R$ ${p.valorUnitario.toFixed(2).replace('.', ',')}</li>`).join('')}
+                                </ul>
+                                <p><strong>Parcelas:</strong></p>
+                                <ul>
+                                    ${sale.parcelas.map(p => `<li>Parcela ${p.parcelNumber}: R$ ${p.value.toFixed(2).replace('.', ',')} (Vencimento: ${new Date(p.dueDate).toLocaleDateString('pt-BR')}) - Status: ${p.status}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(pdfContent);
+                printWindow.document.close();
+                printWindow.print();
+            }
+        };
+
+        window.visualizarRelatorioPdf = async () => {
+            if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+
+            showToast("A gerar o relatório... Por favor, aguarde.");
+
+            const clientsData = clients;
+            const productsData = products;
+            const salesData = sales;
+            
+            const paidSales = sales.filter(sale => sale.status === 'quitado');
+            const inProgressSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && !sale.parcels.some(p => new Date(p.dueDate) < new Date()));
+            const overdueSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && sale.parcels.some(p => new Date(p.dueDate) < new Date()));
+            const canceledSales = sales.filter(sale => sale.status === 'cancelado');
+            const pendingPaymentCount = inProgressSales.length + overdueSales.length;
+
+            const detailedReport = {
+                metadata: {
+                    dataGeracao: new Date().toLocaleString('pt-BR'),
+                    totalClientes: clientsData.length,
+                    totalProdutos: productsData.length,
+                    totalVendas: salesData.length,
+                    faturamentoTotal: salesData.reduce((sum, s) => sum + (s.totalValue || 0), 0),
+                    vendasPagas: paidSales.length,
+                    vendasEmAndamento: inProgressSales.length,
+                    vendasVencidas: overdueSales.length,
+                    vendasFaltandoPagar: pendingPaymentCount,
+                    vendasCanceladas: canceledSales.length
+                },
+                clientes: clientsData,
+                produtos: productsData,
+                vendas: salesData.map(sale => {
+                    const client = clientsData.find(c => c.id === sale.clientId);
+                    const clientName = client ? client.name : 'Cliente Removido';
+
+                    const detailedProducts = (sale.products || []).map(item => {
+                        const selectedProduct = productsData.find(p => p.id === item.productId);
+                        return {
+                            produto: selectedProduct ? selectedProduct.name : 'Produto Removido',
+                            codigo: selectedProduct ? selectedProduct.code : 'N/A',
+                            quantidade: item.quantity,
+                            lote: item.lot || 'N/A',
+                            valorUnitario: item.value,
+                            valorTotalItem: item.quantity * item.value
+                        };
+                    });
+                    
+                    return {
+                        id: sale.id,
+                        cliente: clientName,
+                        evento: sale.eventName,
+                        valorTotal: sale.totalValue,
+                        dataVenda: new Date(sale.createdAt).toLocaleString('pt-BR'),
+                        produtosDetalhado: detailedProducts,
+                        parcelas: sale.parcels
+                    };
+                })
+            };
+
+            const pdfContent = `
+                <style>
+                    body { font-family: 'Inter', sans-serif; margin: 2rem; background-color: #f3f4f6; color: #1e293b; }
+                    h1, h2, h3 { color: #1f2937; }
+                    .header, .section { margin-bottom: 2rem; }
+                    .header h1 { font-size: 2rem; font-weight: bold; text-align: center; }
+                    .section-title { font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+                    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+                    .stat-card { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; }
+                    .table-container { margin-top: 1rem; }
+                    table { width: 100%; border-collapse: collapse; }
+                    th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; }
+                    th { background-color: #f3f4f6; font-size: 0.75rem; color: #4b5563; text-transform: uppercase; }
+                    .client-info p, .product-info p, .sale-info p { margin: 0.25rem 0; }
+                </style>
+                <div class="header">
+                    <h1>Relatório Detalhado - VendavalStore</h1>
+                    <p>Gerado em: ${detailedReport.metadata.dataGeracao}</p>
+                </div>
+                <div class="section">
+                    <h2 class="section-title">Resumo Financeiro</h2>
+                    <div class="stat-grid">
+                        <div class="stat-card"><strong>Faturamento Total:</strong> R$ ${detailedReport.metadata.faturamentoTotal.toFixed(2).replace('.', ',')}</div>
+                        <div class="stat-card"><strong>Vendas Pagas:</strong> ${detailedReport.metadata.vendasPagas}</div>
+                        <div class="stat-card"><strong>Vendas em Andamento:</strong> ${detailedReport.metadata.vendasEmAndamento}</div>
+                        <div class="stat-card"><strong>Vendas Vencidas:</strong> ${detailedReport.metadata.vendasVencidas}</div>
+                        <div class="stat-card"><strong>Vendas Faltando a Pagar:</strong> ${detailedReport.metadata.vendasFaltandoPagar}</div>
+                        <div class="stat-card"><strong>Vendas Canceladas:</strong> ${detailedReport.metadata.vendasCanceladas}</div>
+                        <div class="stat-card"><strong>Total de Clientes:</strong> ${detailedReport.metadata.totalClientes}</div>
+                        <div class="stat-card"><strong>Total de Produtos:</strong> ${detailedReport.metadata.totalProdutos}</div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h2 class="section-title">Detalhamento de Clientes</h2>
+                    ${detailedReport.clientes.map(cliente => `
+                        <div class="client-info" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
+                            <h3>Cliente: ${cliente.name}</h3>
+                            <p><strong>CPF:</strong> ${cliente.cpf}</p>
+                            <p><strong>Contato:</strong> ${cliente.phone} / ${cliente.email}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="section">
+                    <h2 class="section-title">Detalhamento de Produtos</h2>
+                    ${detailedReport.produtos.map(produto => `
+                        <div class="product-info" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
+                            <h3>Produto: ${produto.name}</h3>
+                            <p><strong>Código:</strong> ${produto.code}</p>
+                            <p><strong>Custo:</strong> R$ ${produto.cost.toFixed(2).replace('.', ',')}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="section">
+                    <h2 class="section-title">Detalhamento de Vendas</h2>
+                    ${detailedReport.vendas.map(sale => `
+                        <div class="sale-info" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
+                            <h3>Venda ID: ${sale.id}</h3>
+                            <p><strong>Cliente:</strong> ${sale.cliente}</p>
+                            <p><strong>Data:</strong> ${sale.dataVenda}</p>
+                            <p><strong>Evento:</strong> ${sale.evento}</p>
+                            <p><strong>Valor Total:</strong> R$ ${sale.valorTotal.toFixed(2).replace('.', ',')}</p>
+                            <p><strong>Produtos:</strong></p>
+                            <ul>
+                                ${sale.produtosDetalhado.map(p => `<li>${p.quantidade}x ${p.produto} - Lote: ${p.lote} - R$ ${p.valorUnitario.toFixed(2).replace('.', ',')}</li>`).join('')}
+                            </ul>
+                            <p><strong>Parcelas:</strong></p>
+                            <ul>
+                                ${sale.parcelas.map(p => `<li>Parcela ${p.parcelNumber}: R$ ${p.value.toFixed(2).replace('.', ',')} (Vencimento: ${new Date(p.dueDate).toLocaleDateString('pt-BR')}) - Status: ${p.status}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            const pdfWindow = window.open('', '_blank');
+            pdfWindow.document.write(pdfContent);
+            pdfWindow.document.close();
+            showToast("Visualizando relatório de PDF...");
+        };
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.className = `fixed bottom-4 right-4 text-white px-4 py-2 rounded-lg shadow-lg transition-opacity duration-300 ${type === 'warning' ? 'bg-red-500' : 'bg-green-500'}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        window.showSection = showSection;
+        window.deleteClientAndSales = deleteClientAndSales;
+        window.showConfirmationModal = showConfirmationModal;
+        window.deleteProduct = deleteProduct;
+        window.deleteEvent = deleteEvent;
+        window.openPaymentModal = openPaymentModal;
+        window.hidePaymentModal = hidePaymentModal;
+        window.markParcelAsPaid = markParcelAsPaid;
+        window.revertParcelPayment = revertParcelPayment;
+        window.enviarEmail = enviarEmail;
+        window.visualizarPdf = visualizarPdf;
+        window.visualizarRelatorioPdf = visualizarRelatorioPdf;
+        window.openEditClientModal = openEditClientModal;
+        window.hideEditClientModal = hideEditClientModal;
+        window.saveAllChanges = saveAllChanges;
+        window.saveAndSendEmail = saveAndSendEmail;
+        window.saveAndVisualizarPdf = saveAndVisualizarPdf;
+        window.openProductSelectionModal = openProductSelectionModal;
+        window.hideProductSelectionModal = hideProductSelectionModal;
+        window.saveSelectedProducts = saveSelectedProducts;
+        window.showBackupModal = showBackupModal;
+        window.hideBackupModal = hideBackupModal;
+        window.downloadBackup = downloadBackup;
+        window.restoreBackup = restoreBackup;
+        window.downloadDetailedReport = downloadDetailedReport;
+        window.logout = logout;
+        window.updateClient = updateClient;
+        window.openEditProductModal = openEditProductModal;
+        window.hideEditProductModal = hideEditProductModal;
+        window.openTextEditModal = openTextEditModal;
+        window.hideTextEditModal = hideTextEditModal;
+        window.saveEditableText = saveEditableText;
+    </script>
+</body>
+</html>
