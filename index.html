@@ -4,90 +4,277 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VendavalStore - Sistema de Gestão</title>
-    <!-- Tailwind CSS CDN para estilização rápida e responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a; /* Fundo azul escuro principal */
-            color: #f8fafc; /* Cor do texto padrão para contraste */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            /* Modern minimal palette - Purple, Blue, White, Light Gray, Soft Black */
+            --primary: #7C3AED;
+            --primary-light: #9F67FF;
+            --accent: #3B82F6;
+            --accent-light: #60A5FA;
+            --white: #FFFFFF;
+            --light-gray: #F3F4F6;
+            --dark-gray: #6B7280;
+            --soft-black: #0F172A;
+            --card-bg: #1E293B;
+            --border-color: rgba(124, 58, 237, 0.1);
+            
+            /* Shadows and effects */
+            --shadow-glow: 0 0 30px rgba(124, 58, 237, 0.3);
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.2);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
+        * {
+            transition: var(--transition-smooth);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, var(--soft-black) 0%, #1a2332 100%);
+            color: var(--white);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
         .content-section {
             display: none;
+            animation: fadeInUp 0.5s ease-out;
         }
+        
         .content-section.active {
             display: block;
         }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         .form-disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        /* Nova estilização para botões de navegação */
-        .nav-button.active {
-            @apply bg-blue-600 text-white shadow-md;
-        }
-        .nav-button:not(.active) {
-            @apply bg-slate-700 text-slate-300;
-        }
+        
+        /* Modern Navigation Buttons */
         .nav-button {
-            @apply flex items-center justify-center sm:justify-start gap-2 font-medium py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(10px);
         }
-        /* Corrigir o layout do cabeçalho em telas menores */
+        
+        .nav-button:hover {
+            background: rgba(124, 58, 237, 0.15);
+            border-color: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+        
+        .nav-button.active {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-color: transparent;
+            color: var(--white);
+            box-shadow: var(--shadow-glow);
+        }
+        
         @media (max-width: 640px) {
             .nav-button {
                 width: 100%;
+                justify-content: flex-start;
             }
         }
+        
+        /* Modern Card Design */
         .card {
-            @apply bg-slate-800 rounded-2xl shadow-xl p-6;
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-card);
         }
+        
+        /* Table Styling */
         .table-header {
-            @apply bg-slate-900;
+            background: rgba(15, 23, 42, 0.5);
         }
+        
         .table-row-hover:hover {
-            background-color: #1e293b;
+            background: rgba(124, 58, 237, 0.1);
+            transform: scale(1.01);
+        }
+        
+        /* Remove number input spin buttons */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        
+        /* Modern Input Styling */
+        input, select, textarea {
+            background: rgba(15, 23, 42, 0.8) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 0.75rem !important;
+            color: var(--white) !important;
+            padding: 0.75rem !important;
+            transition: var(--transition-smooth) !important;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1) !important;
+        }
+        
+        /* Button Styling */
+        button:not(.nav-button) {
+            font-weight: 600;
+            border-radius: 0.75rem;
+            transition: var(--transition-smooth);
+        }
+        
+        button:not(.nav-button):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .bg-blue-600 {
+            background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+        }
+        
+        .bg-blue-600:hover {
+            box-shadow: var(--shadow-glow) !important;
+        }
+        
+        .bg-green-600 {
+            background: linear-gradient(135deg, #10B981, #059669) !important;
+        }
+        
+        .bg-red-500, .bg-red-600 {
+            background: linear-gradient(135deg, #EF4444, #DC2626) !important;
+        }
+        
+        /* Dashboard Stats Cards */
+        .stats-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
+            transition: var(--transition-smooth);
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(124, 58, 237, 0.2);
+            border-color: var(--primary);
+        }
+        
+        /* Glow effects for icons */
+        .icon-glow {
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-light);
         }
     </style>
 </head>
-<body class="bg-slate-900 min-h-screen">
-    
-    <div id="login-section" class="flex flex-col items-center justify-center min-h-screen p-4">
-        <div class="bg-slate-800 rounded-2xl shadow-xl p-8 w-full max-w-sm">
-            <h2 class="text-3xl font-bold text-white text-center mb-6">VendavalStore</h2>
-            <p class="text-slate-400 text-center mb-8">Faça login para continuar</p>
+<body class="min-h-screen">
+    <div id="login-section" class="flex flex-col items-center justify-center min-h-screen p-4 relative">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] animate-pulse"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-[100px] animate-pulse" style="animation-delay: 1s;"></div>
+        </div>
+        
+        <div class="relative card max-w-md w-full">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                 <img src="https://i.ibb.co/tMstwg7h/Whats-App-Image-2025-09-08-at-22-07-45.jpg" alt="Logo da VendavalStore" class="h-16 w-16 rounded-full">
+                </div>
+                <h2 class="text-4xl font-bold text-white mb-2">VendavalStore</h2>
+                <p class="text-gray-400">Faça login para continuar</p>
+            </div>
+            
             <form id="loginForm" class="space-y-6">
                 <div>
-                    <label for="email" class="block text-sm font-medium text-slate-300">Email:</label>
-                    <input type="email" id="email" required class="mt-1 block w-full rounded-lg border-slate-700 bg-slate-900 text-white shadow-sm p-3 border-2 focus:ring-blue-500 focus:border-blue-500">
+                    <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                    <input type="email" id="email" required class="mt-1 block w-full">
                 </div>
                 <div>
-                    <label for="password" class="block text-sm font-medium text-slate-300">Senha:</label>
-                    <input type="password" id="password" required class="mt-1 block w-full rounded-lg border-slate-700 bg-slate-900 text-white shadow-sm p-3 border-2 focus:ring-blue-500 focus:border-blue-500">
+                    <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Senha</label>
+                    <input type="password" id="password" required class="mt-1 block w-full">
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="rememberEmail" class="w-4 h-4 text-blue-600 bg-slate-900 border-slate-700 rounded focus:ring-blue-500 focus:ring-2">
+                    <label for="rememberEmail" class="ml-2 text-sm text-gray-300">Lembrar meu e-mail</label>
                 </div>
                 <div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">Entrar</button>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-lg shadow-lg">
+                        Entrar
+                    </button>
                 </div>
                 <div class="text-center mt-4">
-                    <button type="button" id="createAdminBtn" class="text-sm text-slate-400 hover:text-white underline">Criar Conta de Administrador</button>
+                    <button type="button" id="createAdminBtn" class="text-sm text-green-400-200 hover:text-primary transition-colors">
+                      AJRSystem – Transformando processos em produtividade. 
+                    </button>
                 </div>
             </form>
         </div>
-        <!-- Assinatura da AJRSystem fixa no canto inferior direito -->
-        <div class="fixed bottom-4 right-4 text-xs text-slate-400">
-            AJRSystem – Transformando processos em produtividade.
-        </div>
+        
+        <p class="absolute bottom-8 text-sm text-gray-500">
+            
+        </p>
     </div>
 
     <div id="main-content" class="container mx-auto p-4 sm:p-6 lg:p-8 hidden">
-        <!-- Título e navegação principal -->
-        <header class="bg-slate-800 rounded-xl shadow-lg p-6 mb-8 flex flex-col sm:flex-row justify-between items-center">
-            <div class="flex items-center gap-4 mb-4 sm:mb-0">
-                <img src="https://i.ibb.co/tMstwg7h/Whats-App-Image-2025-09-08-at-22-07-45.jpg" alt="Logo da VendavalStore" class="h-12 w-12 rounded-full">
+        <header class="card mb-8 flex flex-col lg:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                    <img src="https://i.ibb.co/tMstwg7h/Whats-App-Image-2025-09-08-at-22-07-45.jpg" alt="Logo da VendavalStore" class="h-14 w-13 rounded-full">
+                </div>
                 <h1 class="text-3xl font-bold text-white">VendavalStore</h1>
             </div>
-            <nav class="flex flex-wrap gap-2 sm:gap-4">
+            
+            <nav class="flex flex-wrap gap-2 justify-center">
                 <button onclick="showSection('dashboard')" class="nav-button active">
                     <i class="fas fa-home"></i> <span class="hidden sm:inline">Início</span>
                 </button>
@@ -107,18 +294,17 @@
                     <i class="fas fa-chart-bar"></i> <span class="hidden sm:inline">Relatórios</span>
                 </button>
                 <button onclick="openTextEditModal()" class="nav-button">
-                    <i class="fas fa-pen"></i> <span class="hidden sm:inline">Editar Texto</span>
+                    <i class="fas fa-pen"></i> <span class="hidden sm:inline">Editar</span>
                 </button>
-                <button onclick="showBackupModal()" class="nav-button bg-slate-600 hover:bg-slate-500 text-white">
+                <button onclick="showBackupModal()" class="nav-button">
                     <i class="fas fa-cloud-upload-alt"></i> <span class="hidden sm:inline">Backup</span>
                 </button>
-                <button onclick="logout()" class="nav-button bg-red-500 hover:bg-red-600 text-white">
+                <button onclick="logout()" class="nav-button" style="background: rgba(239, 68, 68, 0.2); border-color: #EF4444;">
                     <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Sair</span>
                 </button>
             </nav>
         </header>
 
-        <!-- Seções de Conteúdo -->
         <div id="setup-instructions" class="bg-yellow-800 text-yellow-100 p-4 rounded-lg mb-6 hidden">
             <h3 class="font-bold text-lg mb-2">Atenção: Configuração Necessária!</h3>
             <p>Para que o VendavalStore salve seus dados, você precisa conectar seu próprio banco de dados Firebase.</p>
@@ -131,68 +317,65 @@
             <p class="mt-4">Assim que a configuração for concluída, esta mensagem desaparecerá e o programa será habilitado.</p>
         </div>
 
-        <!-- Seção de Dashboard -->
         <main id="dashboard" class="content-section active card">
-            <h2 class="text-2xl font-semibold text-white mb-4">Visão Geral</h2>
-            <div id="dashboard-stats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-slate-900 p-6 rounded-lg shadow-inner flex items-center justify-between h-40">
+            <h2 class="text-3xl font-bold text-white mb-8">Visão Geral</h2>
+            <div id="dashboard-stats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="stats-card p-6 rounded-xl flex items-center justify-between min-h-[160px]">
                     <div class="flex flex-col">
-                        <h3 class="text-blue-400 text-base font-semibold">Total de Vendas Registradas</h3>
-                        <p id="totalSalesCount" class="mt-2 text-4xl font-extrabold text-blue-500">0</p>
+                        <h3 class="text-blue-300 text-sm font-medium mb-2">Total de Vendas</h3>
+                        <p id="totalSalesCount" class="text-3xl font-bold text-white">0</p>
                     </div>
-                    <i class="fas fa-shopping-cart text-5xl text-blue-800"></i>
+                    <i class="fas fa-shopping-cart text-5xl text-blue-500 icon-glow opacity-20"></i>
                 </div>
-                <div class="bg-slate-900 p-6 rounded-lg shadow-inner flex items-center justify-between h-40">
+                <div class="stats-card p-6 rounded-xl flex items-center justify-between min-h-[160px]">
                     <div class="flex flex-col">
-                        <h3 class="text-green-400 text-base font-semibold">Faturamento Total</h3>
-                        <p id="totalRevenue" class="mt-2 text-4xl font-extrabold text-green-500">R$ 0,00</p>
+                        <h3 class="text-green-300 text-sm font-medium mb-2">Faturamento Total</h3>
+                        <p id="totalRevenue" class="text-3xl font-bold text-white">R$ 0,00</p>
                     </div>
-                    <i class="fas fa-dollar-sign text-5xl text-green-800"></i>
+                    <i class="fas fa-dollar-sign text-3xl text-green-500 icon-glow opacity-20"></i>
                 </div>
-                <div class="bg-slate-900 p-6 rounded-lg shadow-inner flex items-center justify-between h-40">
+                <div class="stats-card p-6 rounded-xl flex items-center justify-between min-h-[160px]">
                     <div class="flex flex-col">
-                        <h3 class="text-purple-400 text-base font-semibold">Clientes Cadastrados</h3>
-                        <p id="totalClientsCount" class="mt-2 text-4xl font-extrabold text-purple-500">0</p>
+                        <h3 class="text-purple-300 text-sm font-medium mb-2">Clientes</h3>
+                        <p id="totalClientsCount" class="text-3xl font-bold text-white">0</p>
                     </div>
-                    <i class="fas fa-users text-5xl text-purple-800"></i>
+                    <i class="fas fa-users text-5xl text-purple-500 icon-glow opacity-20"></i>
                 </div>
-                <div class="bg-slate-900 p-6 rounded-lg shadow-inner flex items-center justify-between h-40">
+                <div class="stats-card p-6 rounded-xl flex items-center justify-between min-h-[160px]">
                     <div class="flex flex-col">
-                        <h3 class="text-gray-400 text-base font-semibold">Produtos em Estoque</h3>
-                        <p id="totalProductsCount" class="mt-2 text-4xl font-extrabold text-gray-500">0</p>
+                        <h3 class="text-gray-300 text-sm font-medium mb-2">Produtos</h3>
+                        <p id="totalProductsCount" class="text-3xl font-bold text-white">0</p>
                     </div>
-                    <i class="fas fa-box-open text-5xl text-gray-700"></i>
+                    <i class="fas fa-box-open text-5xl text-gray-400 icon-glow opacity-20"></i>
                 </div>
             </div>
             
-            <div id="dashboard-financial-stats" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-                <div class="bg-slate-900 p-6 rounded-lg shadow-inner">
-                    <h3 class="text-base font-semibold text-white">Valor Total de Produtos Vendidos</h3>
-                    <p id="totalSalesValue" class="mt-2 text-3xl font-extrabold text-green-500">R$ 0,00</p>
+            <div id="dashboard-financial-stats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div class="stats-card p-6 rounded-xl">
+                    <h3 class="text-sm font-medium text-gray-300 mb-2">Valor Total de Produtos Vendidos</h3>
+                    <p id="totalSalesValue" class="text-4xl font-bold text-green-400">R$ 0,00</p>
                 </div>
-                <div class="bg-slate-900 p-6 rounded-lg shadow-inner">
-                    <h3 class="text-base font-semibold text-white">Total Recebido</h3>
-                    <p id="totalReceivedValue" class="mt-2 text-3xl font-extrabold text-blue-500">R$ 0,00</p>
+                <div class="stats-card p-6 rounded-xl">
+                    <h3 class="text-sm font-medium text-gray-300 mb-2">Total Recebido</h3>
+                    <p id="totalReceivedValue" class="text-4xl font-bold text-blue-400">R$ 0,00</p>
                 </div>
-                <div class="bg-slate-900 p-6 rounded-lg shadow-inner">
-                    <h3 class="text-base font-semibold text-white">Valor a Receber</h3>
-                    <p id="totalPendingValue" class="mt-2 text-3xl font-extrabold text-orange-500">R$ 0,00</p>
+                <div class="stats-card p-6 rounded-xl">
+                    <h3 class="text-sm font-medium text-gray-300 mb-2">Valor a Receber</h3>
+                    <p id="totalPendingValue" class="text-4xl font-bold text-orange-400">R$ 0,00</p>
                 </div>
             </div>
             
-            <div class="mt-8">
-                <h3 class="text-2xl font-semibold text-white mb-4">Aniversariantes do Mês</h3>
+            <div class="mt-12">
+                <h3 class="text-2xl font-bold text-white mb-6">Aniversariantes do Mês</h3>
                 <div id="birthdaysList" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <!-- Aniversariantes serão listados aqui -->
-                </div>
+                    </div>
             </div>
 
-            <div id="connection-status" class="mt-4 p-4 bg-slate-700 rounded-md text-sm text-slate-300">
-                <span id="status-message">Conectando ao banco de dados...</span>
+            <div id="connection-status" class="mt-6 p-4 rounded-xl" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);">
+                <span id="status-message" class="text-blue-300 text-sm">Conectando ao banco de dados...</span>
             </div>
         </main>
 
-        <!-- Seção de Clientes -->
         <div id="clientes" class="content-section card">
             <h2 class="text-2xl font-semibold text-white mb-4">Cadastro de Clientes</h2>
             <form id="clientForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -232,6 +415,9 @@
             </form>
 
             <h3 class="text-xl font-semibold text-white mb-2">Lista de Clientes</h3>
+            <div class="mb-4">
+                <input type="text" id="clientSearchInput" placeholder="Pesquisar clientes por nome ou CPF..." class="w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
             <div class="overflow-x-auto rounded-lg shadow-md">
                 <table class="min-w-full bg-slate-800 rounded-lg">
                     <thead class="bg-slate-700">
@@ -245,13 +431,11 @@
                         </tr>
                     </thead>
                     <tbody id="clientsTableBody" class="divide-y divide-slate-700">
-                        <!-- Clientes carregados dinamicamente aqui -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Nova Seção de Produtos -->
         <div id="produtos" class="content-section card">
             <h2 class="text-2xl font-semibold text-white mb-4">Cadastro de Produtos</h2>
             <form id="productForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -283,6 +467,9 @@
 
 
             <h3 class="text-xl font-semibold text-white mb-2">Lista de Produtos</h3>
+            <div class="mb-4">
+                <input type="text" id="productSearchInput" placeholder="Pesquisar produtos por nome ou código..." class="w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
             <div class="overflow-x-auto rounded-lg shadow-md">
                 <table class="min-w-full bg-slate-800 rounded-lg">
                     <thead class="bg-slate-700">
@@ -295,13 +482,11 @@
                         </tr>
                     </thead>
                     <tbody id="productsTableBody" class="divide-y divide-slate-700">
-                        <!-- Produtos carregados dinamicamente aqui -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Nova Seção de Eventos -->
         <div id="eventos" class="content-section card">
             <h2 class="text-2xl font-semibold text-white mb-4">Cadastro de Eventos</h2>
             <form id="eventForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -316,6 +501,9 @@
                 </div>
             </form>
             <h3 class="text-xl font-semibold text-white mb-2">Lista de Eventos</h3>
+            <div class="mb-4">
+                <input type="text" id="eventSearchInput" placeholder="Pesquisar eventos por nome..." class="w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
             <div class="overflow-x-auto rounded-lg shadow-md">
                 <table class="min-w-full bg-slate-800 rounded-lg">
                     <thead class="bg-slate-700">
@@ -325,13 +513,11 @@
                         </tr>
                     </thead>
                     <tbody id="eventsTableBody" class="divide-y divide-slate-700">
-                        <!-- Eventos carregados dinamicamente aqui -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Seção de Vendas -->
         <div id="vendas" class="content-section card">
             <h2 class="text-2xl font-semibold text-white mb-4">Cadastro e Gestão de Vendas</h2>
             
@@ -352,8 +538,7 @@
                         </button>
                     </div>
                     <div id="newSaleProductsList" class="space-y-2 text-slate-300">
-                        <!-- Produtos selecionados serão renderizados aqui -->
-                    </div>
+                        </div>
                 </div>
 
                 <div class="bg-slate-900 rounded-lg p-4">
@@ -383,7 +568,6 @@
             </form>
             
             <h3 class="text-xl font-semibold text-white mb-2 mt-8">Histórico de Vendas</h3>
-            <!-- Campo de pesquisa de vendas -->
             <div class="mb-4">
                 <input type="text" id="saleSearchInput" placeholder="Pesquisar vendas por ID..." class="w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
@@ -401,54 +585,60 @@
                         </tr>
                     </thead>
                     <tbody id="salesTableBody" class="divide-y divide-slate-700">
-                        <!-- Vendas carregadas dinamicamente aqui -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
         
-        <!-- Seção de Relatórios -->
         <div id="relatorios" class="content-section card">
             <h2 class="text-2xl font-semibold text-white mb-4">Relatórios de Vendas e Faturamento</h2>
             <div id="reports-content" class="text-slate-300">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                    <div class="bg-slate-900 p-6 rounded-lg shadow-md p-4">
                         <p class="text-sm font-semibold text-slate-400">Faturamento Total</p>
                         <p id="reportsTotalRevenue" class="mt-1 text-2xl font-bold text-white">R$ 0,00</p>
                     </div>
-                    <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                    <div class="bg-slate-900 p-6 rounded-lg shadow-md p-4">
                         <p class="text-sm font-semibold text-slate-400">Vendas Pagas</p>
                         <p id="paidSalesCount" class="mt-1 text-2xl font-bold text-green-500">0</p>
                     </div>
-                    <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                    <div class="bg-slate-900 p-6 rounded-lg shadow-md p-4">
                         <p class="text-sm font-semibold text-slate-400">Vendas Em Andamento</p>
                         <p id="inProgressSalesCount" class="mt-1 text-2xl font-bold text-blue-500">0</p>
                     </div>
-                    <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                    <div class="bg-slate-900 p-6 rounded-lg shadow-md p-4">
                         <p class="text-sm font-semibold text-slate-400">Vendas Vencidas</p>
                         <p id="overdueSalesCount" class="mt-1 text-2xl font-bold text-orange-500">0</p>
                     </div>
-                     <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                     <div class="bg-slate-900 p-6 rounded-lg shadow-md p-4">
                         <p class="text-sm font-semibold text-slate-400">Vendas Faltando a Pagar</p>
                         <p id="pendingPaymentCount" class="mt-1 text-2xl font-bold text-orange-500">0</p>
                     </div>
-                    <div class="bg-slate-900 rounded-lg shadow-md p-4">
+                    <div class="bg-slate-900 p-6 rounded-lg shadow-md p-4">
                         <p class="text-sm font-semibold text-slate-400">Vendas Canceladas</p>
                         <p id="canceledSalesCount" class="mt-1 text-2xl font-bold text-red-500">0</p>
                     </div>
                 </div>
             </div>
-            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4 flex-wrap">
                 <button onclick="downloadDetailedReport('json')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
                     <i class="fas fa-file-download mr-2"></i> Baixar Relatório Completo (JSON)
                 </button>
                 <button onclick="visualizarRelatorioPdf()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
                     <i class="fas fa-file-pdf"></i> Visualizar Relatório Completo (PDF)
                 </button>
+                 <button onclick="visualizarRelatorioProdutosVendidos()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-box-check mr-2"></i> Produtos Vendidos (PDF)
+                </button>
+                <button onclick="showReportByEventModal()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-calendar-check mr-2"></i> Relatório por Eventos
+                </button>
+                <button onclick="visualizarRelatorioPedidosVencidos()" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Pedidos Vencidos (PDF)
+                </button>
             </div>
         </div>
         
-        <!-- Modal de Confirmação -->
         <div id="modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
             <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
                 <h3 class="text-lg font-semibold text-white mb-4">Confirmação</h3>
@@ -460,7 +650,6 @@
             </div>
         </div>
         
-        <!-- Modal de Pagamento (agora também para edição de produtos) -->
         <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
             <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-lg">
                 <h3 class="text-2xl font-semibold text-white mb-4 text-center">Gestão de Venda e Parcelas</h3>
@@ -468,8 +657,7 @@
                 <div class="mb-4">
                     <p class="text-lg font-semibold text-white mb-2">Itens da Venda:</p>
                     <ul id="editSaleProductsList" class="space-y-2 max-h-48 overflow-y-auto">
-                        <!-- Produtos da venda serão carregados aqui -->
-                    </ul>
+                        </ul>
                     <div class="flex justify-end mt-2">
                         <button type="button" onclick="openProductSelectionModal('edit-sale')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
                             <i class="fas fa-edit mr-2"></i> Adicionar/Alterar Produtos
@@ -485,7 +673,8 @@
                             <select id="editSaleEventSelect" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2"></select>
                         </div>
                         <div>
-                            <label for="editSaleTotalValue" class="block text-sm font-medium text-slate-300">Valor Total da Venda (R$):</label>
+                            <label for="editSaleTotalValue" class="block text-sm font-medium text-slate-300">Valor Total da Venda (Nota R$):</label>
+                            <!-- ALTERADO: REMOVIDO 'readonly' para permitir edição manual e correção -->
                             <input type="number" id="editSaleTotalValue" step="0.01" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
                         </div>
                         <div>
@@ -495,14 +684,34 @@
                                 <option value="pix-parcelado">Pix parcelado</option>
                             </select>
                         </div>
+                        
+                        <div class="md:col-span-2 lg:col-span-1">
+                            <label for="newInstallmentsInput" class="block text-sm font-medium text-slate-300">Novo Nº de Parcelas:</label>
+                            <div class="flex items-center gap-2 mt-1">
+                                <input type="number" id="newInstallmentsInput" min="1" max="36" class="flex-1 rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 text-sm border-2">
+                                <button type="button" id="recalculateParcelsBtn" onclick="recalculateParcels()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">Recalc</button>
+                            </div>
+                        </div>
+                        <div>
+                             <label for="advancePayment" class="block text-sm font-medium text-slate-300">Adiantamento (R$):</label>
+                             <div class="flex items-center gap-2 mt-1">
+                                 <input type="number" id="advancePayment" step="0.01" value="0.00" class="flex-1 rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 text-sm border-2">
+                                 <button type="button" onclick="applyAdvancePayment()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">Aplicar</button>
+                             </div>
+                         </div>
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <p class="text-lg font-semibold text-white mb-2">Gestão de Parcelas:</p>
                     <div id="parcelList" class="max-h-48 overflow-y-auto border-t border-b border-slate-700 py-4 text-slate-300">
-                        <!-- Parcelas serão inseridas aqui dinamicamente -->
-                    </div>
+                        </div>
+                </div>
+
+                <div class="mt-4">
+                    <p class="text-lg font-semibold text-white mb-2">Histórico de Adiantamentos:</p>
+                    <div id="advancementList" class="max-h-48 overflow-y-auto border-t border-slate-700 py-4 text-slate-300">
+                        </div>
                 </div>
 
                 <div class="flex flex-wrap justify-end gap-2 mt-4">
@@ -522,7 +731,6 @@
             </div>
         </div>
 
-        <!-- Modal de Backup/Restauro -->
         <div id="backupModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
             <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
                 <h3 class="text-lg font-semibold text-white mb-4 text-center">Gestão de Backup</h3>
@@ -542,7 +750,6 @@
             </div>
         </div>
 
-        <!-- Modal de Edição de Produto -->
         <div id="editProductModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
             <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
                 <h3 class="text-lg font-semibold text-white mb-4 text-center">Editar Produto</h3>
@@ -567,7 +774,6 @@
             </div>
         </div>
         
-        <!-- Novo Modal de Edição de Cliente -->
         <div id="editClientModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
             <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-lg">
                 <h3 class="text-2xl font-semibold text-white mb-4 text-center">Editar Dados do Cliente</h3>
@@ -608,17 +814,37 @@
             </div>
         </div>
 
-        <!-- Modal de Seleção de Produtos -->
+        <!-- NOVO MODAL PARA EDIÇÃO DE ID DE VENDA -->
+        <div id="editSaleIdModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
+                <h3 class="text-xl font-semibold text-white mb-4 text-center">Editar ID da Venda</h3>
+                <form id="editSaleIdForm" class="space-y-4">
+                    <input type="hidden" id="originalSaleId">
+                    <div>
+                        <label for="currentSaleIdDisplay" class="block text-sm font-medium text-slate-300">ID Atual:</label>
+                        <input type="text" id="currentSaleIdDisplay" readonly class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-slate-400 shadow-sm p-2 border-2 cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label for="newSaleIdInput" class="block text-sm font-medium text-slate-300">Novo ID da Venda:</label>
+                        <input type="text" id="newSaleIdInput" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div class="flex justify-end gap-2 mt-4">
+                        <button type="button" onclick="hideEditSaleIdModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">Cancelar</button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">Salvar Novo ID</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- FIM DO NOVO MODAL -->
+
         <div id="productSelectionModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
             <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-2xl">
                 <h3 class="text-2xl font-semibold text-white mb-4 text-center">Adicionar Produtos à Venda</h3>
-                <!-- Campo de pesquisa adicionado aqui -->
                 <div class="mb-4">
                     <input type="text" id="productSearchInput" placeholder="Pesquisar produtos..." class="w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2 focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <div id="productSelectionCheckboxes" class="max-h-80 overflow-y-auto mb-4 border border-slate-700 rounded-lg p-4">
-                    <!-- Produtos e inputs de quantidade, lote e valor serão inseridos aqui dinamicamente -->
-                </div>
+                    </div>
                 <div class="flex justify-end gap-2 mt-4">
                     <button onclick="saveSelectedProducts()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
                         <i class="fas fa-check-circle mr-2"></i> Confirmar
@@ -629,14 +855,32 @@
                 </div>
             </div>
         </div>
+        
+        <div id="reportByEventModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm">
+                <h3 class="text-xl font-semibold text-white mb-4 text-center">Relatório por Evento</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="reportEventSelect" class="block text-sm font-medium text-slate-300">Selecione o Evento:</label>
+                        <select id="reportEventSelect" required class="mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 border-2">
+                            <option value="">-- Selecione --</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-end gap-2 mt-4">
+                        <button onclick="hideReportByEventModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">Cancelar</button>
+                        <button onclick="generateEventReport()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-chart-line mr-2"></i> Gerar Relatório
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Novo Modal de Edição de Texto -->
         <div id="textEditModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 hidden">
             <div class="bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-2xl">
                 <h3 class="text-2xl font-semibold text-white mb-4 text-center">Editar Texto do E-mail/PDF</h3>
                 <p class="text-slate-300 mb-4 text-center">Edite o texto abaixo. Ele será usado no corpo do e-mail e nos rodapés dos PDFs.</p>
                 
-                <!-- O editor de formatação foi substituído por uma textarea simples para garantir texto limpo -->
                 <textarea id="editableTextarea" class="w-full h-96 rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-4 border-2 resize-none overflow-y-auto focus:ring-blue-500 focus:border-blue-500"></textarea>
                 
                 <div class="flex justify-end gap-2 mt-4">
@@ -650,17 +894,16 @@
             </div>
         </div>
 
-        <!-- Toast Notification -->
         <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-4 py-2 rounded-lg shadow-lg hidden">
             <p id="toast-message"></p>
         </div>
     </div>
-    
-    <!-- Scripts do Firebase e do Aplicativo -->
+
     <script type="module">
         // Importações do Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // IMPORTADO: writeBatch para transação de edição de ID
         import { getFirestore, doc, onSnapshot, collection, addDoc, updateDoc, deleteDoc, getDocs, where, query, setLogLevel, writeBatch, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Variáveis globais do ambiente Canvas
@@ -683,6 +926,8 @@
         let currentSaleId = null;
         let currentEditingClientId = null;
         let currentEditingProductId = null; // Novo ID para o produto a ser editado
+        // NOVO: ID da venda que está sendo editada no modal de ID
+        let currentEditingSaleId = null; 
         
         // Guarda os produtos selecionados para uma nova venda
         let newSaleSelectedProducts = {};
@@ -812,6 +1057,30 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             }
         };
 
+        // --- Funções de Lembrar Email ---
+        function loadRememberedEmail() {
+            const rememberedEmail = localStorage.getItem('rememberedEmail');
+            const rememberCheckbox = document.getElementById('rememberEmail');
+            const emailInput = document.getElementById('email');
+            
+            if (rememberedEmail) {
+                emailInput.value = rememberedEmail;
+                rememberCheckbox.checked = true;
+            }
+        }
+
+        function saveEmailIfRemembered(email) {
+            const rememberCheckbox = document.getElementById('rememberEmail');
+            if (rememberCheckbox.checked) {
+                localStorage.setItem('rememberedEmail', email);
+            } else {
+                localStorage.removeItem('rememberedEmail');
+            }
+        }
+
+        // Carregar email salvo quando a página carregar
+        document.addEventListener('DOMContentLoaded', loadRememberedEmail);
+
         // --- Funções de Login e Logout ---
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -820,6 +1089,7 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
+                saveEmailIfRemembered(email);
                 showToast("Login bem-sucedido!");
             } catch (e) {
                 console.error("Erro no login:", e);
@@ -911,6 +1181,7 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 querySnapshot.forEach((doc) => {
                     clients.push({ id: doc.id, ...doc.data() });
                 });
+                clients.sort((a, b) => a.name.localeCompare(b.name));
                 renderClients();
                 populateClientSelect();
                 renderBirthdays();
@@ -922,7 +1193,7 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 querySnapshot.forEach((doc) => {
                     products.push({ id: doc.id, ...doc.data() });
                 });
-                products.sort((a, b) => a.code - b.code);
+                products.sort((a, b) => a.name.localeCompare(b.name)); // Ordena os produtos por nome em ordem alfabética
                 renderProducts();
                 updateTotalStockValue();
             });
@@ -933,8 +1204,10 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 querySnapshot.forEach((doc) => {
                     events.push({ id: doc.id, ...doc.data() });
                 });
+                events.sort((a, b) => a.name.localeCompare(b.name)); // Ordena os eventos por nome em ordem alfabética
                 renderEvents();
                 populateEventSelect();
+                populateReportEventSelect(); // NOVO: Preenche a lista do modal de relatórios por evento
             });
 
             const salesCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/vendas`);
@@ -943,11 +1216,24 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 querySnapshot.forEach((doc) => {
                     sales.push({ id: doc.id, ...doc.data() });
                 });
+                sales.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Ordena as vendas pela data de criação em ordem decrescente
                 renderSales();
                 updateDashboard();
             });
         }
 
+        /**
+         * Função auxiliar para normalizar CPF (remove pontos, hífens e espaços)
+         */
+        function normalizeCPF(cpf) {
+            if (!cpf) return '';
+            return cpf.replace(/[.\-\s]/g, '').trim();
+        }
+
+        /**
+         * FUNÇÃO MODIFICADA: Adiciona verificação de CPF único antes de cadastrar.
+         * Normaliza o CPF para garantir comparação correta.
+         */
         async function addClient(clientData) {
             if (!isAuthReady) {
                 showToast('Aguarde a conexão com o banco de dados...', 'warning');
@@ -955,6 +1241,28 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             }
             try {
                 const clientsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/clientes`);
+                
+                // Normaliza o CPF (remove pontos, hífens e espaços)
+                const normalizedCPF = normalizeCPF(clientData.cpf);
+                
+                // Valida se o CPF tem 11 dígitos após normalização
+                if (normalizedCPF.length !== 11 || !/^\d+$/.test(normalizedCPF)) {
+                    showToast("Erro: CPF inválido. O CPF deve conter exatamente 11 dígitos.", 'warning');
+                    return;
+                }
+                
+                // 1. Cria a query para buscar por um cliente com o mesmo CPF normalizado
+                const cpfQuery = query(clientsCollectionRef, where("cpf", "==", normalizedCPF));
+                const querySnapshot = await getDocs(cpfQuery);
+
+                if (!querySnapshot.empty) {
+                    // 2. Se a query retornar resultados, o CPF já está em uso.
+                    showToast("Erro: Um cliente com este CPF já está cadastrado. CPF deve ser único.", 'warning');
+                    return; // Aborta a adição
+                }
+
+                // 3. Se não houver resultados, adiciona o novo cliente com CPF normalizado
+                clientData.cpf = normalizedCPF;
                 await addDoc(clientsCollectionRef, clientData);
                 showToast("Cliente adicionado com sucesso!");
             } catch (e) {
@@ -1173,12 +1481,47 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             }
         }
 
+        /**
+         * FUNÇÃO MODIFICADA: Adiciona verificação de CPF único ao editar.
+         * Garante que o novo CPF não pertença a nenhum outro cliente, exceto o atual.
+         * Normaliza o CPF para garantir comparação correta.
+         */
         async function updateClient(clientId, clientData) {
             if (!isAuthReady) {
                 showToast('Aguarde a conexão com o banco de dados...', 'warning');
                 return;
             }
             try {
+                const clientsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/clientes`);
+
+                // Normaliza o CPF (remove pontos, hífens e espaços)
+                const normalizedCPF = normalizeCPF(clientData.cpf);
+                
+                // Valida se o CPF tem 11 dígitos após normalização
+                if (normalizedCPF.length !== 11 || !/^\d+$/.test(normalizedCPF)) {
+                    showToast("Erro: CPF inválido. O CPF deve conter exatamente 11 dígitos.", 'warning');
+                    return;
+                }
+
+                // 1. Cria a query para buscar por clientes com o novo CPF normalizado
+                const cpfQuery = query(clientsCollectionRef, where("cpf", "==", normalizedCPF));
+                const querySnapshot = await getDocs(cpfQuery);
+
+                let cpfAlreadyExists = false;
+                querySnapshot.forEach(doc => {
+                    // 2. Se a query retornar um documento que NÃO é o cliente que está sendo editado (clientId)
+                    if (doc.id !== clientId) { 
+                        cpfAlreadyExists = true;
+                    }
+                });
+
+                if (cpfAlreadyExists) {
+                    showToast("Erro: O CPF inserido já pertence a outro cliente cadastrado.", 'warning');
+                    return; // Aborta a atualização
+                }
+
+                // 3. Se o CPF for único, atualiza o cliente com CPF normalizado
+                clientData.cpf = normalizedCPF;
                 const clientDocRef = doc(db, `artifacts/${appId}/users/${userId}/clientes`, clientId);
                 await updateDoc(clientDocRef, clientData);
                 showToast("Dados do cliente atualizados com sucesso!");
@@ -1190,10 +1533,10 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
         }
         
         // --- Funções de Renderização da UI ---
-        function renderClients() {
+        function renderClients(filteredClients = clients) {
             const tableBody = document.getElementById('clientsTableBody');
             tableBody.innerHTML = '';
-            clients.forEach(client => {
+            filteredClients.forEach(client => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-slate-700 transition-colors';
                 row.innerHTML = `
@@ -1214,6 +1557,15 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 tableBody.appendChild(row);
             });
         }
+        
+        document.getElementById('clientSearchInput').addEventListener('keyup', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredClients = clients.filter(c => 
+                c.name.toLowerCase().includes(searchTerm) || 
+                (c.cpf || '').toLowerCase().includes(searchTerm)
+            );
+            renderClients(filteredClients);
+        });
 
         function renderBirthdays() {
             const birthdaysList = document.getElementById('birthdaysList');
@@ -1252,10 +1604,10 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             });
         }
         
-        function renderProducts() {
+        function renderProducts(filteredProducts = products) {
             const tableBody = document.getElementById('productsTableBody');
             tableBody.innerHTML = '';
-            products.forEach(product => {
+            filteredProducts.forEach(product => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-slate-700 transition-colors';
                 row.innerHTML = `
@@ -1278,11 +1630,20 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 tableBody.appendChild(row);
             });
         }
+
+        document.getElementById('productSearchInput').addEventListener('keyup', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredProducts = products.filter(p =>
+                p.name.toLowerCase().includes(searchTerm) ||
+                p.code.toString().includes(searchTerm)
+            );
+            renderProducts(filteredProducts);
+        });
         
-        function renderEvents() {
+        function renderEvents(filteredEvents = events) {
             const tableBody = document.getElementById('eventsTableBody');
             tableBody.innerHTML = '';
-            events.forEach(event => {
+            filteredEvents.forEach(event => {
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-slate-700 transition-colors';
                 row.innerHTML = `
@@ -1296,6 +1657,14 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 tableBody.appendChild(row);
             });
         }
+        
+        document.getElementById('eventSearchInput').addEventListener('keyup', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredEvents = events.filter(event =>
+                event.name.toLowerCase().includes(searchTerm)
+            );
+            renderEvents(filteredEvents);
+        });
 
         function populateClientSelect() {
             const select = document.getElementById('saleClient');
@@ -1323,6 +1692,18 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             const select = document.getElementById('saleEvent');
             
             select.innerHTML = '<option value="">Selecione um evento</option>';
+            events.forEach(event => {
+                const option = document.createElement('option');
+                option.value = event.id;
+                option.textContent = event.name;
+                select.appendChild(option);
+            });
+        }
+        
+        // NOVO: Preenche o select do modal de relatório por evento
+        function populateReportEventSelect() {
+            const select = document.getElementById('reportEventSelect');
+            select.innerHTML = '<option value="">-- Selecione --</option>';
             events.forEach(event => {
                 const option = document.createElement('option');
                 option.value = event.id;
@@ -1360,6 +1741,7 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 if (mode === 'new-sale') {
                      displayElement.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
                 } else {
+                     // NOVO: Atualiza o valor do input, que agora é editável
                      displayElement.value = total.toFixed(2);
                 }
             }
@@ -1432,7 +1814,8 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             filteredSales.forEach(sale => {
                 const client = clients.find(c => c.id === sale.clientId);
                 const clientName = client ? client.name : 'Cliente Removido';
-                const totalValue = sale.totalValue ? sale.totalValue.toFixed(2).replace('.', ',') : '0,00';
+                // Usa o totalValue salvo no banco (o valor da nota)
+                const totalValue = sale.totalValue ? sale.totalValue.toFixed(2).replace('.', ',') : '0,00'; 
                 const createdAt = formatDateAsDDMMYYYY(sale.createdAt);
                 
                 let statusColor = '';
@@ -1481,6 +1864,10 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                         <button onclick="openPaymentModal('${sale.id}')" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
                             <i class="fas fa-info-circle"></i>
                         </button>
+                        <!-- NOVO BOTÃO DE EDIÇÃO DE ID -->
+                        <button onclick="openEditSaleIdModal('${sale.id}')" class="bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105" title="Editar ID da Venda">
+                            <i class="fas fa-key"></i>
+                        </button>
                         <button onclick="enviarEmail('${sale.id}')" class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
                             <i class="fas fa-envelope"></i>
                         </button>
@@ -1490,7 +1877,7 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                         <button onclick="showConfirmationModal('cancel-sale', '${sale.id}')" class="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
                             <i class="fas fa-times-circle"></i>
                         </button>
-                        <button onclick="showConfirmationModal('delete-sale', '${sale.id}')" class="bg-red-600 hover:bg-red-600 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
+                        <button onclick="showConfirmationModal('delete-sale', '${sale.id}')" class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-1 px-3 rounded-md shadow-md transition-all duration-300 transform hover:scale-105">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -1514,7 +1901,7 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             const clientsCount = clients.length;
             const productsCount = products.length;
             
-            let totalSalesValue = 0;
+            let totalSalesOriginalValue = 0; // O valor total da VENDA (Valor da Nota, que é o campo totalValue)
             let totalReceivedValue = 0;
             const paidSales = [];
             const inProgressSales = [];
@@ -1522,23 +1909,31 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             const canceledSales = [];
 
             sales.forEach(sale => {
+                // Verifica se a venda está cancelada primeiro
                 if (sale.status === 'cancelado') {
                     canceledSales.push(sale);
-                    return;
+                    return; // Não inclui vendas canceladas nos cálculos
                 }
 
-                totalSalesValue += sale.totalValue;
+                // Usa o totalValue salvo no documento (o Valor da Nota)
+                const saleTotalNoteValue = sale.totalValue || 0;
+                totalSalesOriginalValue += saleTotalNoteValue;
                 
-                sale.parcels.forEach(p => {
-                    if (p.status === 'pago') {
-                        totalReceivedValue += p.value;
+                // Calcula o valor total remanescente das parcelas (apenas parcelas NÃO pagas)
+                const totalRemainingParcels = sale.parcels.reduce((sum, p) => {
+                    if (p.status !== 'pago') {
+                        return sum + (p.value || 0);
                     }
-                });
+                    return sum;
+                }, 0);
+                
+                // O valor recebido é a diferença entre o total original da nota e o que resta a pagar
+                totalReceivedValue += (saleTotalNoteValue - totalRemainingParcels);
 
                 if (sale.status === 'quitado') {
                      paidSales.push(sale);
                 } else {
-                    const hasOverdue = sale.parcels && sale.parcels.some(p => p.status !== 'pago' && new Date(p.dueDate) < new Date());
+                    const hasOverdue = sale.parcels && sale.parcels.some(p => p.status !== 'pago' && new Date(p.dueDate) < new Date() && p.value > 0); // Verifica se tem valor a pagar
                     if (hasOverdue) {
                         overdueSales.push(sale);
                     } else {
@@ -1547,17 +1942,15 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 }
             });
 
-            const totalPendingValue = totalSalesValue - totalReceivedValue;
+            const totalPendingValue = totalSalesOriginalValue - totalReceivedValue; 
             
-            document.getElementById('totalSalesValue').textContent = 'R$ ' + totalSalesValue.toFixed(2).replace('.', ',');
+            document.getElementById('totalSalesValue').textContent = 'R$ ' + totalSalesOriginalValue.toFixed(2).replace('.', ',');
             document.getElementById('totalReceivedValue').textContent = 'R$ ' + totalReceivedValue.toFixed(2).replace('.', ',');
             document.getElementById('totalPendingValue').textContent = 'R$ ' + totalPendingValue.toFixed(2).replace('.', ',');
             
-            const totalRevenue = sales.reduce((sum, s) => sum + (s.totalValue || 0), 0);
-
             document.getElementById('totalSalesCount').textContent = totalSalesCount;
-            document.getElementById('totalRevenue').textContent = 'R$ ' + totalRevenue.toFixed(2).replace('.', ',');
-            document.getElementById('reportsTotalRevenue').textContent = 'R$ ' + totalRevenue.toFixed(2).replace('.', ',');
+            document.getElementById('totalRevenue').textContent = 'R$ ' + totalSalesOriginalValue.toFixed(2).replace('.', ',');
+            document.getElementById('reportsTotalRevenue').textContent = 'R$ ' + totalSalesOriginalValue.toFixed(2).replace('.', ',');
             document.getElementById('paidSalesCount').textContent = paidSales.length;
             document.getElementById('inProgressSalesCount').textContent = inProgressSales.length;
             document.getElementById('overdueSalesCount').textContent = overdueSales.length;
@@ -1680,7 +2073,10 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             
             for (let i = 1; i <= installments; i++) {
                 const dueDate = new Date(today);
-                dueDate.setMonth(today.getMonth() + i);
+                // A primeira parcela é sempre hoje, as próximas são um mês depois.
+                if (i > 1) {
+                    dueDate.setMonth(today.getMonth() + i - 1);
+                }
                 parcels.push({
                     parcelNumber: i,
                     value: parcelValue,
@@ -1693,11 +2089,12 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 clientId,
                 eventId,
                 eventName,
-                totalValue,
+                totalValue, // Este é o valor ORIGINAL da nota (será atualizado no DB)
                 paymentMethod,
                 installments,
                 products: Object.values(newSaleSelectedProducts),
                 parcels,
+                advancements: [], // Inicializa o array de adiantamentos
                 status: 'em andamento',
                 createdAt: new Date().toISOString()
             };
@@ -1759,6 +2156,36 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             document.getElementById('modal').classList.add('hidden');
         });
         
+        // NOVA FUNÇÃO: Renderiza a lista de adiantamentos no modal de pagamento
+        function renderAdvancements(sale) {
+            const advancementList = document.getElementById('advancementList');
+            advancementList.innerHTML = '';
+            
+            const advancements = sale.advancements || [];
+
+            if (advancements.length === 0) {
+                advancementList.innerHTML = '<p class="text-slate-500 text-sm">Nenhum adiantamento registrado para esta venda.</p>';
+                return;
+            }
+
+            advancements.forEach((adv, index) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-3 border-b border-slate-700 last:border-b-0';
+                
+                item.innerHTML = `
+                    <div>
+                        <p class="text-sm font-medium text-white">Valor: R$ ${adv.value.toFixed(2).replace('.', ',')}</p>
+                        <p class="text-xs text-slate-400">Data: ${formatDateAsDDMMYYYY(adv.date)}</p>
+                    </div>
+                    <button onclick="revertAdvancement('${sale.id}', ${index})" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-undo mr-1"></i> Reverter
+                    </button>
+                `;
+                advancementList.appendChild(item);
+            });
+        }
+        
+        // ======================= FUNÇÃO MODIFICADA =======================
         window.openPaymentModal = (saleId) => {
             currentSaleId = saleId;
             const sale = sales.find(s => s.id === saleId);
@@ -1766,22 +2193,45 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
 
             // Carrega os dados da venda para o modal de pagamento/edição
             populateEditEventSelect(sale.eventId);
-            document.getElementById('editSaleTotalValue').value = sale.totalValue.toFixed(2);
+            // CORRIGIDO: Usa o totalValue salvo no DB para carregar o Valor Total da Nota
+            document.getElementById('editSaleTotalValue').value = sale.totalValue.toFixed(2); 
             document.getElementById('editSalePaymentMethod').value = sale.paymentMethod;
             
-            // Preenche a lista de produtos na seção de edição
+            // Lógica para o novo campo de recalcular parcelas
+            const newInstallmentsInput = document.getElementById('newInstallmentsInput');
+            const recalculateBtn = document.getElementById('recalculateParcelsBtn');
+
+            // Desabilita a função se a venda estiver quitada
+            if (sale.status === 'quitado' || (sale.parcels || []).reduce((sum, p) => sum + p.value, 0) <= 0) {
+                newInstallmentsInput.disabled = true;
+                recalculateBtn.disabled = true;
+                newInstallmentsInput.value = (sale.parcels || []).length;
+            } else {
+                newInstallmentsInput.disabled = false;
+                recalculateBtn.disabled = false;
+                newInstallmentsInput.value = (sale.parcels || []).length;
+            }
+            
             editSaleSelectedProducts = {};
             (sale.products || []).forEach(p => {
-                editSaleSelectedProducts[p.productId] = { 
-                    ...p
-                };
+                editSaleSelectedProducts[p.productId] = { ...p };
             });
-            renderEditSaleProducts();
 
+            renderEditSaleProducts();
+            renderParcels(sale);
+            renderAdvancements(sale);
+
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+        // =================================================================
+
+        // Nova função para renderizar as parcelas
+        function renderParcels(sale) {
             const parcelList = document.getElementById('parcelList');
             parcelList.innerHTML = '';
             
-            (sale.parcels || []).forEach((parcel, index) => {
+            const parcels = sale.parcels || [];
+            parcels.forEach((parcel, index) => {
                 const item = document.createElement('div');
                 const dueDate = new Date(parcel.dueDate).toISOString().split('T')[0];
                 
@@ -1791,10 +2241,17 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 const today = new Date();
                 const parcelDueDate = new Date(parcel.dueDate);
 
-                if (parcel.status === 'pago') {
+                // O status é 'Pago' se o status for 'pago' OU se o valor restante for zero (abatido por adiantamento)
+                const isPaid = parcel.status === 'pago' || parcel.value <= 0;
+
+                if (isPaid) {
                     statusColor = 'bg-green-500';
                     statusText = 'Pago';
-                    buttonHtml = `<button onclick="revertParcelPayment('${sale.id}', ${index})" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 ml-4">Reverter</button>`;
+                    // Reverter pagamento só é relevante se o pagamento foi manual (status === 'pago')
+                    if(parcel.status === 'pago' && parcel.value > 0) {
+                        buttonHtml = `<button onclick="revertParcelPayment('${sale.id}', ${index})" class="bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 ml-4">Reverter</button>`;
+                    }
+                    
                 } else if (parcelDueDate < today) {
                     statusColor = 'bg-orange-500';
                     statusText = 'Vencida';
@@ -1805,14 +2262,14 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                     buttonHtml = `<button onclick="markParcelAsPaid('${sale.id}', ${index})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 ml-4">Marcar como Pago</button>`;
                 }
                 
-                item.className = 'flex flex-wrap items-center justify-between p-3 border-b border-slate-700 last:border-b-0 gap-4';
+                item.className = 'flex flex-wrap items-center justify-between p-3 border-b border-slate-700 last:border-b-0 gap-4 parcel-item-container';
                 item.innerHTML = `
                     <div class="flex-1 min-w-[100px]">
                         <p class="text-sm font-medium text-white">Parcela ${parcel.parcelNumber}:</p>
                     </div>
                     <div class="flex-1 min-w-[120px]">
                          <label class="block text-xs font-medium text-slate-400">Valor (R$)</label>
-                        <input type="number" step="0.01" value="${parcel.value.toFixed(2)}" class="parcel-value mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 text-sm border-2">
+                        <input type="number" step="0.01" value="${parcel.value.toFixed(2)}" class="parcel-value mt-1 block w-full rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-2 text-sm border-2" ${isPaid ? 'readonly' : ''}>
                     </div>
                     <div class="flex-1 min-w-[120px]">
                         <label class="block text-xs font-medium text-slate-400">Vencimento</label>
@@ -1827,91 +2284,488 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 `;
                 parcelList.appendChild(item);
             });
-
-            document.getElementById('paymentModal').classList.remove('hidden');
         }
         
-        // Função para reverter o estoque em caso de erro na edição da venda
-        async function revertStockChanges(originalProducts, updatedProducts, batch) {
-            const productUpdates = {};
+        // ======================= FUNÇÃO RECALCULAR PARCELAS =======================
+        /**
+         * NOVA FUNÇÃO: Recalcula as parcelas de uma venda existente.
+         */
+        window.recalculateParcels = () => {
+            const sale = sales.find(s => s.id === currentSaleId);
+            if (!sale) return;
 
-            // Reverte o estoque dos produtos removidos
-            originalProducts.forEach(originalProduct => {
-                const updatedProduct = updatedProducts.find(up => up.productId === originalProduct.productId);
-                if (!updatedProduct) {
-                    productUpdates[originalProduct.productId] = (productUpdates[originalProduct.productId] || 0) + originalProduct.quantity;
-                }
-            });
-
-            // Reverte o estoque dos produtos com quantidade alterada
-            updatedProducts.forEach(updatedProduct => {
-                const originalProduct = originalProducts.find(op => op.productId === updatedProduct.productId);
-                if (originalProduct && originalProduct.quantity !== updatedProduct.quantity) {
-                    productUpdates[updatedProduct.productId] = (productUpdates[updatedProduct.productId] || 0) + (originalProduct.quantity - updatedProduct.quantity);
-                }
-            });
-
-            for (const productId in productUpdates) {
-                const productRef = doc(db, `artifacts/${appId}/users/${userId}/produtos`, productId);
-                const product = products.find(p => p.id === productId);
-                if (product) {
-                    const newStock = (product.stock || 0) + productUpdates[productId];
-                    batch.update(productRef, { stock: newStock });
-                }
+            if (sale.status === 'quitado') {
+                showToast("Não é possível recalcular parcelas de uma venda já quitada.", 'warning');
+                return;
+            }
+            
+            const newInstallmentsInput = document.getElementById('newInstallmentsInput');
+            const newTotalInstallments = parseInt(newInstallmentsInput.value);
+            
+            if (isNaN(newTotalInstallments) || newTotalInstallments <= 0) {
+                showToast("Por favor, insira um número de parcelas válido.", 'warning');
+                return;
             }
 
+            if (newTotalInstallments === (sale.parcels || []).length) {
+                showToast("O novo número de parcelas é igual ao atual.", 'info');
+                return;
+            }
+
+            // 1. Calcula o valor total que ainda falta pagar
+            const totalRemainingValue = (sale.parcels || []).reduce((sum, p) => sum + p.value, 0);
+
+            if (totalRemainingValue <= 0) {
+                showToast("Esta venda já foi totalmente paga ou abatida. Não há valor para reparcelar.", 'warning');
+                return;
+            }
+            
+            // 2. Calcula o valor de cada nova parcela
+            const newParcelValue = totalRemainingValue / newTotalInstallments;
+            
+            // 3. Gera o novo array de parcelas
+            const newParcelsArray = [];
+            const today = new Date();
+
+            for (let i = 1; i <= newTotalInstallments; i++) {
+                const dueDate = new Date();
+                // A primeira parcela vence no próximo mês, e assim por diante
+                dueDate.setMonth(today.getMonth() + i);
+                
+                newParcelsArray.push({
+                    parcelNumber: i,
+                    value: newParcelValue,
+                    dueDate: dueDate.toISOString(),
+                    status: 'em andamento'
+                });
+            }
+
+            // 4. Atualiza o objeto da venda *localmente* e re-renderiza a lista de parcelas
+            // As alterações só serão salvas no banco de dados ao clicar em "Salvar Alterações"
+            const saleToUpdate = sales.find(s => s.id === currentSaleId);
+            saleToUpdate.parcels = newParcelsArray;
+            
+            renderParcels(saleToUpdate);
+            
+            showToast("Parcelas recalculadas com sucesso! Revise os novos valores e datas, e clique em 'Salvar Alterações' para confirmar.", 'info');
+        };
+        // =================================================================
+
+        // FUNÇÃO REESCRITA para aplicar adiantamento com a nova lógica
+        window.applyAdvancePayment = async () => {
+            const advanceInput = document.getElementById('advancePayment');
+            let advanceValue = parseFloat(advanceInput.value);
+            
+            if (isNaN(advanceValue) || advanceValue <= 0) {
+                showToast("Por favor, insira um valor de adiantamento válido.", 'warning');
+                return;
+            }
+
+            const sale = sales.find(s => s.id === currentSaleId);
+            if (!sale) return;
+
+            // 1. Cria uma cópia profunda das parcelas para trabalhar localmente
+            const updatedParcels = sale.parcels.map(p => ({ 
+                ...p, 
+                value: parseFloat(p.value.toFixed(2)) 
+            })); 
+            let remainingAdvance = advanceValue;
+            let advancementApplied = false;
+
+            // 2. Encontra todas as parcelas A PAGAR (value > 0 E status != 'pago')
+            const availableParcels = updatedParcels
+                .map((p, index) => ({ ...p, originalIndex: index }))
+                .filter(p => p.value > 0 && p.status !== 'pago');
+
+            if (availableParcels.length === 0) {
+                showToast("Não há parcelas ativas para aplicar o adiantamento. Venda já quitada ou totalmente abatida.", 'warning');
+                return;
+            }
+            
+            // 3. ORDENA: Pela data de vencimento (mais próxima primeiro)
+            availableParcels.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            
+            const initialTargetIndex = availableParcels[0].originalIndex; // Índice da primeira parcela a ser abatida
+
+            // 4. Abate o valor do adiantamento das parcelas em sequência ordenada
+            for (let i = 0; i < availableParcels.length; i++) {
+                if (remainingAdvance <= 0) break;
+
+                const currentParcel = availableParcels[i];
+                const originalIndex = currentParcel.originalIndex;
+                const parcelValue = currentParcel.value;
+
+                if (remainingAdvance >= parcelValue) {
+                    // Adiantamento cobre toda a parcela
+                    remainingAdvance -= parcelValue;
+                    updatedParcels[originalIndex].value = 0;
+                    updatedParcels[originalIndex].status = 'pago';
+                    advancementApplied = true;
+                } else {
+                    // Adiantamento cobre parte da parcela
+                    updatedParcels[originalIndex].value = parcelValue - remainingAdvance;
+                    remainingAdvance = 0; // Adiantamento totalmente aplicado
+                    advancementApplied = true;
+                }
+            }
+            
+            if(!advancementApplied) {
+                showToast("Adiantamento não pôde ser aplicado.", 'warning');
+                return;
+            }
+            
+            // 5. Adiciona o adiantamento ao array de 'advancements'
+            const newAdvancement = {
+                value: advanceValue,
+                date: new Date().toISOString().split('T')[0], // Data de hoje em YYYY-MM-DD
+                parcelIndex: initialTargetIndex // Índice da primeira parcela abatida
+            };
+            
+            const updatedAdvancements = [...(sale.advancements || []), newAdvancement];
+            
+            // 6. Calcula o novo valor total remanescente (soma dos valores remanescentes nas parcelas)
+            const totalRemainingValue = updatedParcels.reduce((sum, p) => sum + p.value, 0);
+
+            // 7. Atualiza o status da venda para 'quitado' se todas as parcelas forem a zero
+            const allParcelsPaid = updatedParcels.every(p => p.value <= 0);
+            const newSaleStatus = allParcelsPaid ? 'quitado' : 'em andamento';
+
+            // 8. Persiste as alterações no Firestore
+            const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, currentSaleId);
             try {
+                await updateDoc(saleDocRef, { 
+                    parcels: updatedParcels,
+                    advancements: updatedAdvancements,
+                    status: newSaleStatus,
+                    // totalValue NÂO é atualizado para manter o valor da nota
+                });
+                
+                // 9. Renderiza as parcelas atualizadas na tela do modal
+                const saleToRender = sales.find(s => s.id === currentSaleId);
+                renderParcels(saleToRender);
+                renderAdvancements(saleToRender); // ATUALIZADO: Renderiza a lista de adiantamentos também
+
+                advanceInput.value = '0.00'; // Limpa o campo
+                showToast("Adiantamento aplicado e salvo com sucesso! O valor das parcelas foi reduzido.");
+
+            } catch (e) {
+                 console.error("Erro ao aplicar adiantamento:", e);
+                 showToast("Erro ao aplicar adiantamento.", 'warning');
+            }
+        };
+
+        // NOVA FUNÇÃO: Reverte um adiantamento, devolvendo o valor para as parcelas
+        window.revertAdvancement = async (saleId, advancementIndex) => {
+            const sale = sales.find(s => s.id === saleId);
+            if (!sale) return;
+
+            const advancements = sale.advancements || [];
+            if (advancementIndex < 0 || advancementIndex >= advancements.length) {
+                showToast("Adiantamento não encontrado.", 'warning');
+                return;
+            }
+
+            // Confirmação do usuário
+            // Usando showConfirmationModal para consistência com o restante do código
+            window.showConfirmationModal('revert-advancement', { saleId, advancementIndex });
+            
+            // A lógica de reversão agora será tratada no listener de confirmação do modal principal
+        };
+        
+        // Adiciona a lógica de `revert-advancement` ao modal principal
+        document.getElementById('modal-confirm-btn').addEventListener('click', async () => {
+            if (currentAction === 'revert-advancement') {
+                const { saleId, advancementIndex } = currentItemId;
+                const sale = sales.find(s => s.id === saleId);
+                
+                if (!sale) return;
+
+                const advancements = sale.advancements || [];
+                const advancementToRevert = advancements[advancementIndex];
+                let valueToRestore = advancementToRevert.value;
+
+                // 1. Remove o adiantamento da lista
+                const updatedAdvancements = advancements.filter((_, index) => index !== advancementIndex);
+                
+                // 2. Cria uma cópia das parcelas para modificação
+                const updatedParcels = JSON.parse(JSON.stringify(sale.parcels));
+                
+                // 3. Calcula o valor original de cada parcela
+                const originalInstallmentValue = sale.totalValue / sale.installments;
+                
+                // 4. Restaura o valor nas parcelas, começando pela que foi abatida primeiro
+                const startIndex = advancementToRevert.parcelIndex || 0;
+
+                for (let i = startIndex; i < updatedParcels.length; i++) {
+                    if (valueToRestore <= 0) break;
+
+                    const parcel = updatedParcels[i];
+                    
+                    // O valor máximo que a parcela pode ter é o valor original da parcela na venda
+                    const maxParcelValue = sale.parcels.length === updatedParcels.length ? originalInstallmentValue : parcel.value + valueToRestore; 
+
+                    const spaceAvailable = maxParcelValue - parcel.value;
+                    const amountToAdd = Math.min(valueToRestore, spaceAvailable);
+                    
+                    if (amountToAdd > 0) {
+                        parcel.value += amountToAdd;
+                        valueToRestore -= amountToAdd;
+                        if(parcel.value > 0) {
+                           parcel.status = 'em andamento';
+                        }
+                    }
+                }
+                
+                // 5. Atualiza o status da venda para 'em andamento', pois ela não está mais quitada
+                const allParcelsPaid = updatedParcels.every(p => p.status === 'pago' || p.value <= 0);
+                const newSaleStatus = allParcelsPaid ? 'quitado' : 'em andamento';
+
+                // 6. Salva as alterações no banco de dados
+                try {
+                    const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, saleId);
+                    await updateDoc(saleDocRef, {
+                        advancements: updatedAdvancements,
+                        parcels: updatedParcels,
+                        status: newSaleStatus
+                    });
+                    
+                    showToast("Adiantamento revertido com sucesso!");
+
+                    // Atualiza a visualização do modal
+                    const updatedSale = { ...sale, advancements: updatedAdvancements, parcels: updatedParcels, status: newSaleStatus };
+                    renderParcels(updatedSale);
+                    renderAdvancements(updatedSale);
+
+                } catch (e) {
+                    console.error("Erro ao reverter adiantamento:", e);
+                    showToast("Erro ao reverter adiantamento.", 'warning');
+                }
+            } else if (currentAction === 'delete-sale' || currentAction === 'delete-client' || currentAction === 'delete-product' || currentAction === 'delete-event' || currentAction === 'cancel-sale') {
+                // Mantém a lógica existente para outras ações
+                // ... (seu código existente para estas ações)
+                if (currentAction === 'delete-sale') {
+                    await deleteSale(currentItemId);
+                } else if (currentAction === 'delete-client') {
+                    await deleteClientAndSales(currentItemId);
+                } else if (currentAction === 'delete-product') {
+                    await deleteProduct(currentItemId);
+                } else if (currentAction === 'delete-event') {
+                    await deleteEvent(currentItemId);
+                } else if (currentAction === 'cancel-sale') {
+                    try {
+                        await revertStockFromSale(currentItemId);
+                        const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, currentItemId);
+                        await updateDoc(saleDocRef, { status: 'cancelado' });
+                        showToast("Status da venda atualizado para 'Cancelado'! O estoque foi revertido.");
+                    } catch (e) {
+                        console.error("Erro ao cancelar venda:", e);
+                        showToast("Erro ao cancelar venda.", 'warning');
+                    }
+                }
+            }
+            document.getElementById('modal').classList.add('hidden');
+        });
+
+        // ======================= FUNÇÕES DE EDIÇÃO DE ID DE VENDA =======================
+
+        /**
+         * NOVO: Abre o modal de edição de ID.
+         */
+        window.openEditSaleIdModal = (saleId) => {
+            currentEditingSaleId = saleId;
+            document.getElementById('originalSaleId').value = saleId;
+            document.getElementById('currentSaleIdDisplay').value = saleId;
+            document.getElementById('newSaleIdInput').value = saleId;
+            document.getElementById('editSaleIdModal').classList.remove('hidden');
+        };
+
+        /**
+         * NOVO: Esconde o modal de edição de ID.
+         */
+        window.hideEditSaleIdModal = () => {
+            document.getElementById('editSaleIdModal').classList.add('hidden');
+            currentEditingSaleId = null;
+        };
+
+        // Adiciona listener de submissão ao formulário do modal
+        document.getElementById('editSaleIdForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await saveSaleIdChange();
+        });
+
+        /**
+         * NOVO: Salva a alteração do ID da venda no Firestore, movendo o documento.
+         */
+        async function saveSaleIdChange() {
+            if (!isAuthReady || !currentEditingSaleId) {
+                showToast('Aguarde a conexão ou selecione uma venda.', 'warning');
+                return;
+            }
+
+            const newId = document.getElementById('newSaleIdInput').value.trim();
+            const originalId = currentEditingSaleId;
+
+            if (newId === originalId) {
+                showToast("O novo ID é idêntico ao atual. Nenhuma alteração salva.", 'info');
+                hideEditSaleIdModal();
+                return;
+            }
+
+            // Simplificação da validação: IDs podem ser apenas números e letras.
+            if (!newId || !/^[a-zA-Z0-9]+$/.test(newId)) {
+                showToast("O novo ID deve conter apenas letras e números e não pode estar vazio.", 'warning');
+                return;
+            }
+            
+            // 1. Verifica se o novo ID já existe
+            try {
+                const newDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, newId);
+                const newDocSnap = await getDoc(newDocRef);
+
+                if (newDocSnap.exists()) {
+                    showToast(`Erro: O ID de venda "${newId}" já está em uso. Escolha outro.`, 'warning');
+                    return;
+                }
+            } catch (e) {
+                console.error("Erro ao verificar novo ID:", e);
+                showToast("Erro ao verificar novo ID.", 'warning');
+                return;
+            }
+
+            // 2. Obtém os dados da venda original
+            const saleToMove = sales.find(s => s.id === originalId);
+            if (!saleToMove) {
+                 showToast("Erro: Venda original não encontrada localmente.", 'warning');
+                 return;
+            }
+            
+            // Remove o ID do objeto de dados antes de salvá-lo como um novo doc (o ID já está no doc.ref)
+            const saleData = { ...saleToMove };
+            delete saleData.id; 
+
+            // 3. Executa a transação (Batch Write)
+            const batch = writeBatch(db);
+            try {
+                // Referência do documento original e do novo
+                const originalDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, originalId);
+                const newDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, newId);
+
+                // a) Cria o novo documento com os dados da venda (setDoc)
+                batch.set(newDocRef, saleData);
+
+                // b) Deleta o documento original (deleteDoc)
+                batch.delete(originalDocRef);
+
+                // c) Commit da operação
                 await batch.commit();
-            } catch (error) {
-                console.error("Erro ao reverter o estoque:", error);
-                showToast("Erro crítico! Não foi possível reverter o estoque. Verifique o console.", 'warning');
+                
+                // Sucesso
+                showToast(`ID da venda alterado de "${originalId}" para "${newId}" com sucesso!`);
+                hideEditSaleIdModal();
+
+            } catch (e) {
+                console.error("Erro ao mover/renomear o ID da venda:", e);
+                showToast("Erro ao salvar o novo ID. Tente novamente.", 'warning');
             }
         }
+        // =================================================================
 
+        /**
+         * FUNÇÃO CORRIGIDA E MELHORADA: saveAllChanges
+         * - Agora usa o valor do input 'editSaleTotalValue' (que é editável) para validação e para salvar no DB.
+         * - Isso garante que, ao adicionar novos produtos, o novo total seja persistido.
+         */
         window.saveAllChanges = async () => {
             if (!currentSaleId) return;
             const sale = sales.find(s => s.id === currentSaleId);
             if (!sale) return;
 
+            // Margem de erro permitida para problemas de ponto flutuante (R$ 0.01)
+            const tolerance = 0.01;
+
+            // 1. OBTÉM o Valor Total da Nota DO INPUT (valor editável e que será salvo)
+            const valorTotalNotaInput = parseFloat(document.getElementById('editSaleTotalValue').value) || 0;
+            
+            // Se o valor for inválido, interrompe.
+            if (isNaN(valorTotalNotaInput) || valorTotalNotaInput <= 0) {
+                 showToast('O Valor Total da Venda (Nota R$) deve ser um número válido e maior que zero.', 'warning');
+                return; 
+            }
+
+            // 2. Coleta as parcelas atualizadas do DOM e calcula o valor remanescente
+            const updatedParcels = [];
+            document.querySelectorAll('#parcelList > .parcel-item-container').forEach((item, index) => {
+                const value = parseFloat(item.querySelector('.parcel-value').value);
+                const dueDate = item.querySelector('.parcel-due-date').value;
+                if(isNaN(value) || value < 0) {
+                    showToast(`O valor da parcela ${index + 1} deve ser um número válido e maior ou igual a zero.`, 'warning');
+                    return; 
+                }
+
+                const originalParcel = sale.parcels.find(p => p.parcelNumber === (index + 1));
+                let newStatus = originalParcel.status;
+                if (value === 0) {
+                    newStatus = 'pago'; 
+                } else if (originalParcel.status !== 'pago') {
+                     newStatus = 'em andamento';
+                }
+
+                updatedParcels.push({
+                    parcelNumber: index + 1,
+                    value: value,
+                    status: newStatus,
+                    dueDate: dueDate
+                });
+            });
+            
+            // 3. Calcule o total pago (Adiantamentos)
+            const totalAdiantamentos = (sale.advancements || []).reduce((sum, adv) => sum + adv.value, 0);
+
+            // 4. Calcula a soma total atual (Parcelas Remanescentes + Adiantamentos)
+            const totalParcelasRemanescentes = updatedParcels.reduce((sum, p) => sum + p.value, 0);
+            const somaTotalAtual = totalParcelasRemanescentes + totalAdiantamentos;
+
+            // 5. Realiza a validação: Nota Total (Input) deve ser igual à Soma (Parcelas + Adiantamentos)
+            if (Math.abs(valorTotalNotaInput - somaTotalAtual) > tolerance) {
+                const diferenca = (valorTotalNotaInput - somaTotalAtual).toFixed(2).replace('.', ',');
+                
+                showToast(`ERRO DE COERÊNCIA: O Valor Total da Venda (R$ ${valorTotalNotaInput.toFixed(2).replace('.', ',')}) deve ser igual à soma dos Adiantamentos e Parcelas Remanescentes (R$ ${somaTotalAtual.toFixed(2).replace('.', ',')}). Há uma diferença de R$ ${diferenca}. Por favor, corrija o Valor Total da Venda ou os valores das parcelas/adiantamentos.`, 'warning');
+                return; // Interrompe o processo de salvamento
+            }
+            
+            // ----------------------------------------------------------------------
+            // SE A VALIDAÇÃO PASSAR, O PROCESSO DE SALVAMENTO SEGUE NORMALMENTE
+            // ----------------------------------------------------------------------
+            
             const batch = writeBatch(db);
 
-            // 1. Coleta os dados novos e originais para comparação
+            // 6. Lógica de estoque (ajuste baseado na diferença entre produtos antigos e novos)
             const originalProducts = sale.products || [];
+            // Filtra os produtos válidos do modal de seleção (que podem ter sido editados)
             const updatedProducts = Object.values(editSaleSelectedProducts).filter(p => parseFloat(p.quantity) > 0 && parseFloat(p.value) > 0);
             
-            // 2. Compara as listas e calcula as diferenças de estoque
             const stockUpdates = {};
-
-            // Produtos removidos ou com quantidade diminuída
             originalProducts.forEach(originalProduct => {
                 const updatedProduct = updatedProducts.find(up => up.productId === originalProduct.productId);
                 if (!updatedProduct) {
-                    // Produto removido da venda
+                    // Produto removido: reverter estoque
                     stockUpdates[originalProduct.productId] = (stockUpdates[originalProduct.productId] || 0) + originalProduct.quantity;
                 } else if (updatedProduct.quantity < originalProduct.quantity) {
-                    // Quantidade diminuída
+                    // Quantidade diminuída: reverter diferença
                     stockUpdates[originalProduct.productId] = (stockUpdates[originalProduct.productId] || 0) + (originalProduct.quantity - updatedProduct.quantity);
                 }
             });
-
-            // Produtos adicionados ou com quantidade aumentada
             updatedProducts.forEach(updatedProduct => {
                 const originalProduct = originalProducts.find(op => op.productId === updatedProduct.productId);
                 if (!originalProduct) {
-                    // Novo produto adicionado
+                    // Produto novo adicionado: diminuir estoque
                     stockUpdates[updatedProduct.productId] = (stockUpdates[updatedProduct.productId] || 0) - updatedProduct.quantity;
                 } else if (updatedProduct.quantity > originalProduct.quantity) {
-                    // Quantidade aumentada
+                    // Quantidade aumentada: diminuir diferença
                     stockUpdates[updatedProduct.productId] = (stockUpdates[updatedProduct.productId] || 0) - (updatedProduct.quantity - originalProduct.quantity);
                 }
             });
 
-            // 3. Verifica se há estoque suficiente para as alterações
-            const currentStockState = {};
-            products.forEach(p => {
-                currentStockState[p.id] = p.stock;
-            });
-            
             for (const productId in stockUpdates) {
                 const stockChange = stockUpdates[productId];
                 const product = products.find(p => p.id === productId);
@@ -1919,54 +2773,38 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                     const newStock = (product.stock || 0) + stockChange;
                     if (newStock < 0) {
                         showToast(`Estoque insuficiente para a edição do produto: ${product.name}. A operação foi cancelada.`, 'warning');
-                        return; // Aborta a operação
+                        return;
                     }
                     const productDocRef = doc(db, `artifacts/${appId}/users/${userId}/produtos`, productId);
                     batch.update(productDocRef, { stock: newStock });
                 }
             }
 
-            // 4. Salva as outras alterações da venda
+            // 7. Salva as alterações na venda
             const newEventId = document.getElementById('editSaleEventSelect').value;
             const newEvent = events.find(e => e.id === newEventId);
             const newEventName = newEvent ? newEvent.name : 'Evento não encontrado';
-            
-            const updatedParcels = [];
-            document.querySelectorAll('#parcelList > div').forEach((item, index) => {
-                const value = parseFloat(item.querySelector('.parcel-value').value);
-                const dueDate = item.querySelector('.parcel-due-date').value;
-                if(isNaN(value) || value <= 0) {
-                    showToast('O valor da parcela deve ser um número válido e maior que zero.', 'warning');
-                    return; // Retorna e não salva as alterações
-                }
-
-                updatedParcels.push({
-                    parcelNumber: index + 1,
-                    value: value,
-                    status: sale.parcels[index].status,
-                    dueDate: dueDate
-                });
-            });
-
-            const newTotalValue = updatedParcels.reduce((sum, p) => sum + p.value, 0);
-
             const newPaymentMethod = document.getElementById('editSalePaymentMethod').value;
             
-            const updatedSaleData = {
-                ...sale,
+            const allParcelsPaid = updatedParcels.every(p => p.status === 'pago' || p.value === 0);
+            const newSaleStatus = allParcelsPaid ? 'quitado' : 'em andamento';
+            
+            const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, currentSaleId);
+            
+            batch.update(saleDocRef, {
                 eventId: newEventId,
                 eventName: newEventName,
-                totalValue: newTotalValue,
                 paymentMethod: newPaymentMethod,
                 parcels: updatedParcels,
                 products: updatedProducts,
+                advancements: sale.advancements || [], // Garante que adiantamentos são mantidos
+                status: newSaleStatus,
+                totalValue: valorTotalNotaInput, // <--- CORRIGIDO: Salva o novo valor da nota
                 lastUpdated: new Date().toISOString()
-            };
-            
-            const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, currentSaleId);
-            batch.update(saleDocRef, updatedSaleData);
+            });
 
-            // 5. Commit as alterações
+
+            // 8. Commit as alterações
             try {
                 await batch.commit();
                 showToast("Venda atualizada e estoque ajustado com sucesso!");
@@ -1974,24 +2812,21 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             } catch (e) {
                 console.error("Erro ao salvar as alterações:", e);
                 showToast("Erro ao salvar as alterações.", 'warning');
-                // Em caso de falha no commit, o ideal seria reverter as alterações de estoque, mas o Firestore não suporta rollbacks
             }
         };
         
         window.saveAndSendEmail = async () => {
-            if (!currentSaleId) return;
-            const success = await saveAllChanges();
-            if (success) {
-                enviarEmail(currentSaleId);
-            }
+            // saveAllChanges é assíncrono e não retorna um valor booleano, 
+            // então não podemos confiar que foi bem sucedido antes de enviar o email.
+            // Para simplificar, faremos o envio de email após o save.
+            await saveAllChanges();
+            enviarEmail(currentSaleId);
         };
         
         window.saveAndVisualizarPdf = async () => {
-            if (!currentSaleId) return;
-            const success = await saveAllChanges();
-            if (success) {
-                visualizarPdf(currentSaleId);
-            }
+            // saveAllChanges é assíncrono.
+            await saveAllChanges();
+            visualizarPdf(currentSaleId);
         };
 
         window.hidePaymentModal = () => {
@@ -2003,8 +2838,8 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             const sale = sales.find(s => s.id === saleId);
             if (!sale) return;
 
-            const allPaid = (sale.parcels || []).every(p => p.status === 'pago');
-            if (allPaid && sale.status !== 'quitado') {
+            const allPaidOrZero = (sale.parcels || []).every(p => p.status === 'pago' || p.value <= 0);
+            if (allPaidOrZero && sale.status !== 'quitado') {
                 try {
                     const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, saleId);
                     await updateDoc(saleDocRef, { status: 'quitado' });
@@ -2016,42 +2851,144 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             }
         }
 
+        /**
+         * FUNÇÃO ATUALIZADA:
+         * Agora, antes de marcar como pago, ela salva as alterações de valor e data de todas as parcelas.
+         */
         window.markParcelAsPaid = async (saleId, parcelIndex) => {
             const sale = sales.find(s => s.id === saleId);
             if (!sale) return;
 
-            const updatedParcels = [...(sale.parcels || [])];
-            if (updatedParcels[parcelIndex].status === 'em andamento' || updatedParcels[parcelIndex].status === 'vencido') {
-                updatedParcels[parcelIndex].status = 'pago';
-                try {
-                    const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, saleId);
-                    await updateDoc(saleDocRef, { parcels: updatedParcels });
-                    showToast("Parcela marcada como paga!");
-                    checkIfSaleIsPaid(saleId);
-                    window.openPaymentModal(saleId);
-                } catch (e) {
-                    console.error("Erro ao marcar parcela como paga:", e);
-                    showToast("Erro ao marcar parcela como paga.", 'warning');
+            // 1. Coleta os valores e datas atuais dos inputs do modal e prepara a atualização da parcela clicada
+            const updatedParcels = [];
+            let totalValueOriginalSale = 0; // Para calcular o valor total ORIGINAL da venda (sem adiantamentos)
+
+            document.querySelectorAll('#parcelList > .parcel-item-container').forEach((item, index) => {
+                const value = parseFloat(item.querySelector('.parcel-value').value);
+                const dueDate = item.querySelector('.parcel-due-date').value;
+                const originalParcel = sale.parcels.find(p => p.parcelNumber === (index + 1));
+                
+                let status = originalParcel.status;
+                if (index === parcelIndex) {
+                    status = 'pago'; // Marca a parcela clicada como paga manualmente
+                } else if (value <= 0) {
+                    status = 'pago'; // Mantém como pago se o valor for zero (pelo adiantamento)
                 }
+                
+                // NOTA: Para o markParcelAsPaid, mantemos o valor do input (que pode ter sido abatido ou editado)
+                const finalValue = (index === parcelIndex) ? 0 : value; // Se foi pago manualmente, o valor passa a ser 0
+
+                updatedParcels.push({
+                    parcelNumber: index + 1,
+                    value: finalValue,
+                    status: status,
+                    dueDate: dueDate
+                });
+            });
+
+            // 2. Recalcula o valor total remanescente (a pagar)
+            const totalRemainingValue = updatedParcels.reduce((sum, p) => sum + p.value, 0);
+
+            try {
+                const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, saleId);
+                await updateDoc(saleDocRef, { 
+                    parcels: updatedParcels,
+                    // REMOVIDO: totalValue: totalRemainingValue, // Não atualiza mais o totalValue
+                    status: (totalRemainingValue <= 0) ? 'quitado' : 'em andamento'
+                });
+                showToast("Parcela marcada como paga e dados salvos!");
+                // Não precisamos mais de checkIfSaleIsPaid, pois já verificamos acima.
+                
+            } catch (e) {
+                console.error("Erro ao marcar parcela como paga:", e);
+                showToast("Erro ao marcar parcela como paga.", 'warning');
             }
         };
         
+        /**
+         * FUNÇÃO ATUALIZADA:
+         * Reverte o pagamento manual de uma parcela, voltando ao status 'em andamento'.
+         */
         window.revertParcelPayment = async (saleId, parcelIndex) => {
             const sale = sales.find(s => s.id === saleId);
             if (!sale) return;
 
-            const updatedParcels = [...(sale.parcels || [])];
-            if (updatedParcels[parcelIndex].status === 'pago') {
-                updatedParcels[parcelIndex].status = 'em andamento';
-                try {
-                    const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, saleId);
-                    await updateDoc(saleDocRef, { parcels: updatedParcels, status: 'em andamento' });
-                    showToast("Pagamento da parcela revertido!");
-                    window.openPaymentModal(saleId);
-                } catch (e) {
-                    console.error("Erro ao reverter o pagamento da parcela:", e);
-                    showToast("Erro ao reverter o pagamento da parcela.", 'warning');
+            // 1. Encontra o valor original da parcela (se existir uma cópia antes do adiantamento, seria melhor)
+            // Como não temos o valor original da parcela antes de um adiantamento, usaremos o valor atual do input, mas voltando o status
+            
+            // Coleta os valores e datas atuais dos inputs do modal
+            const updatedParcels = [];
+            
+            // Valor antes do pagamento manual (para o caso de ter sido abatido)
+            let valueBeforeManualPayment = 0; 
+
+            document.querySelectorAll('#parcelList > .parcel-item-container').forEach((item, index) => {
+                const value = parseFloat(item.querySelector('.parcel-value').value);
+                const dueDate = item.querySelector('.parcel-due-date').value;
+                const originalParcel = sale.parcels.find(p => p.parcelNumber === (index + 1));
+                
+                let status = originalParcel.status;
+                let finalValue = value;
+
+                if (index === parcelIndex) {
+                    status = 'em andamento'; // Reverte o status
+                    // Se a parcela estava marcada como 'pago' *manualmente* (value > 0), voltamos o status.
+                    // Se o status era 'pago' *por adiantamento* (value <= 0), não revertemos o valor.
+                    if (originalParcel.status === 'pago' && originalParcel.value > 0) {
+                        // Se foi paga manualmente (status 'pago' e valor > 0 antes de zerar), restauramos o valor original da parcela na criação
+                        // NOTA: Para restaurar o valor, precisaríamos do valor original da parcela, que não está armazenado separadamente. 
+                        // Já que as parcelas podem ter sido alteradas/adiantadas, o único valor de referência é o que estava no Firestore antes da mudança.
+                        // Para evitar a perda total do valor, vamos forçar o status para 'em andamento' e manter o valor que estava no input.
+                        // *No entanto*, o `markParcelAsPaid` seta o valor para 0. Aqui vamos restaurar o valor que estava no Firestore.
+                        
+                        // Encontra o valor que a parcela tinha no Firestore ANTES do pagamento
+                        const saleBeforePayment = sales.find(s => s.id === saleId);
+                        const parcelBeforePayment = saleBeforePayment.parcels[parcelIndex];
+                        finalValue = parcelBeforePayment.value;
+                        
+                    } else if (originalParcel.value <= 0) {
+                         // Se a parcela foi zerada por adiantamento, *não* alteramos o valor, apenas o status (caso o adiantamento tenha sido revertido).
+                         // Mas como não temos lógica de reversão de adiantamento, apenas revertemos o status se não for 0.
+                         finalValue = originalParcel.value; // Mantém 0
+                         status = 'pago'; // Reverter um "pago" que é 0 deve ser impossível sem reverter o adiantamento.
+                         showToast("A reversão de pagamento não se aplica a parcelas abatidas por adiantamento.", 'warning');
+                         return; // Aborta a operação
+                    } else {
+                        // Caso padrão de reversão de um pagamento manual (status pago)
+                        finalValue = originalParcel.value;
+                    }
+                    valueBeforeManualPayment = originalParcel.value;
+
+                } else if (value <= 0) {
+                    status = 'pago'; // Mantém como pago se o valor for zero
+                    finalValue = value;
+                } else {
+                    status = originalParcel.status;
+                    finalValue = value;
                 }
+
+                updatedParcels.push({
+                    parcelNumber: index + 1,
+                    value: finalValue,
+                    status: status,
+                    dueDate: dueDate
+                });
+            });
+
+            // Recalcula o valor total remanescente
+            const totalRemainingValue = updatedParcels.reduce((sum, p) => sum + p.value, 0);
+
+            try {
+                const saleDocRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, saleId);
+                await updateDoc(saleDocRef, { 
+                    parcels: updatedParcels, 
+                    status: 'em andamento', // O status da venda volta para "em andamento"
+                    // REMOVIDO: totalValue: totalRemainingValue // Não atualiza mais o totalValue
+                });
+                showToast("Pagamento da parcela revertido e dados salvos!");
+            } catch (e) {
+                console.error("Erro ao reverter o pagamento da parcela:", e);
+                showToast("Erro ao reverter o pagamento da parcela.", 'warning');
             }
         };
 
@@ -2241,7 +3178,7 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                         <span class="text-slate-300">Código ${product.code} - ${product.name}</span>
                         <div class="flex space-x-2">
                             <input type="number" data-product-id="${product.id}" data-type="quantity" value="${productData.quantity}" min="1" max="10" class="product-selection-input w-16 text-center rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-1 text-sm border-2">
-                            <input type="number" data-product-id="${productId}" data-type="lot" value="${productData.lot || ''}" min="1" max="10" class="product-selection-input w-20 text-center rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-1 text-sm border-2">
+                            <input type="number" data-product-id="${product.id}" data-type="lot" value="${productData.lot || ''}" min="1" max="10" class="product-selection-input w-20 text-center rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-1 text-sm border-2">
                             <input type="number" step="0.01" data-product-id="${product.id}" data-type="value" value="${productData.value}" min="0.01" class="product-selection-input w-20 text-center rounded-md border-slate-700 bg-slate-900 text-white shadow-sm p-1 text-sm border-2">
                         </div>
                     `;
@@ -2346,6 +3283,7 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
 
         // --- Funções de formatação de data para evitar problemas de fuso horário ---
         function formatDateAsDDMMYYYY(isoString) {
+            if (!isoString) return 'N/A';
             const date = new Date(isoString);
             const day = String(date.getUTCDate()).padStart(2, '0');
             const month = String(date.getUTCMonth() + 1).padStart(2, '0');
@@ -2353,6 +3291,42 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             return `${day}/${month}/${year}`;
         }
         
+        /**
+         * NOVA FUNÇÃO: Gera a lista mesclada e ordenada de parcelas e adiantamentos.
+         * É usada tanto para o e-mail quanto para o PDF.
+         */
+        function getParcelAndAdvancementDetails(sale) {
+            const items = [];
+            
+            // 1. Adiciona todas as parcelas
+            (sale.parcels || []).forEach(p => {
+                const isAbated = p.value <= 0;
+                const statusDisplay = isAbated ? 'Pago (Abatido)' : p.status.charAt(0).toUpperCase() + p.status.slice(1);
+
+                items.push({
+                    type: 'parcel',
+                    sortDate: p.dueDate,
+                    display: `- Parcela ${p.parcelNumber}: R$ ${p.value.toFixed(2).replace('.', ',')} (Vencimento: ${formatDateAsDDMMYYYY(p.dueDate)}) - Status: ${statusDisplay}`
+                });
+            });
+
+            // 2. Adiciona todos os adiantamentos e os vincula à parcela original
+            (sale.advancements || []).forEach(adv => {
+                const parcelAbatida = (sale.parcels || []).find(p => p.parcelNumber === (adv.parcelIndex + 1));
+                
+                items.push({
+                    type: 'advancement',
+                    sortDate: adv.date, 
+                    display: `[ADTO] Data: ${formatDateAsDDMMYYYY(adv.date)} | Status: Adiantamento Pago | Valor: R$ ${adv.value.toFixed(2).replace('.', ',')} -> Abatido a partir da Parcela ${parcelAbatida ? parcelAbatida.parcelNumber : 'N/A'}`
+                });
+            });
+
+            // 3. Ordena por data (o adiantamento deve vir antes da parcela que compartilha a mesma data de vencimento/aplicação)
+            items.sort((a, b) => new Date(a.sortDate) - new Date(b.sortDate));
+
+            return items.map(item => item.display).join('\n');
+        }
+
         // --- FUNÇÃO ATUALIZADA PARA USAR MAILTO: ---
         function enviarEmail(saleId) {
             const sale = sales.find(s => s.id === saleId);
@@ -2367,7 +3341,12 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 return;
             }
             
-            const totalValue = sale.totalValue.toFixed(2).replace('.', ',');
+            // Usa o totalValue salvo no DB (o valor da nota)
+            const originalTotalValue = sale.totalValue ? sale.totalValue.toFixed(2).replace('.', ',') : '0,00';
+            
+            // Calcula o valor remanescente a pagar (soma dos valores restantes nas parcelas)
+            const totalRemainingValue = sale.parcels.reduce((sum, p) => sum + (p.value || 0), 0).toFixed(2).replace('.', ',');
+            
             const productsList = (sale.products || []).map(item => {
                 const product = products.find(p => p.id === item.productId);
                 const productName = product ? product.name : 'Produto Removido';
@@ -2375,7 +3354,8 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
                 return `- ${productName} (Qtd: ${item.quantity})${lot}`;
             }).join('\n');
             
-            const parcelDetails = (sale.parcels || []).map(p => `- Parcela ${p.parcelNumber}: R$ ${p.value.toFixed(2).replace('.', ',')} (Vencimento: ${formatDateAsDDMMYYYY(p.dueDate)}) - Status: ${p.status}`).join('\n');
+            // Usa a nova função para gerar os detalhes de parcelas e adiantamentos
+            const parcelDetails = getParcelAndAdvancementDetails(sale);
             
             const to = client.email;
             const subject = `Comprovante de Pedido #${sale.id} - VendavalStore`;
@@ -2384,16 +3364,16 @@ VendaVal Store, há 20 anos investindo na satisfação do cliente`;
             const body = `
 Olá, ${client.name}!
 
-Aqui estão os detalhes do seu pedido Nº ID #${sale.id}: na Vendaval Store,
+Aqui estão os detalhes do seu pedido Nº ID #${sale.id}: na Vendaval Store.
 
-Valor Total: R$ ${totalValue}
+Valor Total da Venda (Nota): R$ ${originalTotalValue}
 Forma de Pagamento: ${sale.paymentMethod}
 Evento: ${sale.eventName}
 
 Produtos:
 ${productsList}
 
-Parcelas:
+Parcelas e Adiantamentos:
 ${parcelDetails}
 
 ---
@@ -2414,7 +3394,10 @@ ${editableText}
             if (!sale) return;
             const client = clients.find(c => c.id === sale.clientId);
             
-            const totalValue = sale.totalValue || 0;
+            const totalRemainingValue = sale.parcels.reduce((sum, p) => sum + (p.value || 0), 0);
+            // Usa o totalValue salvo no DB (o valor da nota)
+            const originalTotal = sale.totalValue || 0;
+
 
             const productsText = (sale.products || []).map(item => {
                 const product = products.find(p => p.id === item.productId);
@@ -2424,8 +3407,14 @@ ${editableText}
                 return `<div class="parcel-item">- ${productName} (Qtd: ${item.quantity}, ${lotText}, Valor: R$ ${item.value.toFixed(2).replace('.', ',')}) - Total: R$ ${totalItemValue}</div>`;
             }).join('');
             
+            // Usa a nova função para gerar os detalhes de parcelas e adiantamentos
+            const parcelAndAdvancementText = getParcelAndAdvancementDetails(sale);
             // Converte o texto simples com quebras de linha para HTML com <br>
+            const formattedParcelAndAdvancementText = parcelAndAdvancementText.replace(/\n/g, '<br>');
+
+            // Converte o texto simples do rodapé com quebras de linha para HTML com <br>
             const formattedEditableText = editableText.replace(/\n/g, '<br>');
+
 
             const content = `
                 <style>
@@ -2441,7 +3430,7 @@ ${editableText}
                     .editable-text-container { margin-top: 20px; }
                 </style>
                 <div class="header">
-                    <h1>Confirmação de Pedido - VendavalStore</h1>
+                    <h1>Comprovante de Pedido - VendavalStore</h1>
                 </div>
                 <div class="info">
                     <p><span>Pedido ID:</span> ${sale.id}</p>
@@ -2452,7 +3441,7 @@ ${editableText}
                 </div>
                 <div class="info">
                     <p><span>Evento:</span> ${sale.eventName}</p>
-                    <p><span>Valor Total:</span> R$ ${totalValue.toFixed(2).replace('.', ',')}</p>
+                    <p><span>Valor Total da Venda (Nota):</span> R$ ${originalTotal.toFixed(2).replace('.', ',')}</p>
                     <p><span>Forma de Pagamento:</span> ${sale.paymentMethod}</p>
                 </div>
                 <div class="parcels-list">
@@ -2460,8 +3449,8 @@ ${editableText}
                     ${productsText}
                 </div>
                 <div class="parcels-list">
-                    <p><span>Parcelas:</span></p>
-                    ${(sale.parcels || []).map(p => `<div class="parcel-item">- Parcela ${p.parcelNumber}: R$ ${p.value.toFixed(2).replace('.', ',')} (Vencimento: ${formatDateAsDDMMYYYY(p.dueDate)}) - <strong>Status:</strong> ${p.status.charAt(0).toUpperCase() + p.status.slice(1)}</div>`).join('')}
+                    <p><span>Parcelas e Adiantamentos:</span></p>
+                    <div style="white-space: pre-wrap;">${formattedParcelAndAdvancementText}</div>
                 </div>
                 <div class="editable-text-container">
                     ${formattedEditableText}
@@ -2492,8 +3481,7 @@ ${editableText}
                 const clientsSnapshot = await getDocs(collection(db, `artifacts/${appId}/users/${userId}/clientes`));
                 const productsSnapshot = await getDocs(collection(db, `artifacts/${appId}/users/${userId}/produtos`));
                 const salesSnapshot = await getDocs(collection(db, `artifacts/${appId}/users/${userId}/vendas`));
-
-                const backupData = {
+				const backupData = {
                     clients: clientsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
                     products: productsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
                     sales: salesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
@@ -2574,12 +3562,15 @@ ${editableText}
                     batch.set(docRef, product);
                 });
                 backupData.sales.forEach(sale => {
+                    // Garante que o campo advancements exista
+                    if (!sale.advancements) {
+                        sale.advancements = [];
+                    }
                     const docRef = doc(db, `artifacts/${appId}/users/${userId}/vendas`, sale.id);
                     batch.set(docRef, sale);
                 });
 
-                await batch.commit();
-                showToast("Dados restaurados com sucesso! A aplicação será atualizada.");
+                await batch.commishowToast("Dados restaurados com sucesso! A aplicação será atualizada.");
                 hideBackupModal();
             } catch (e) {
                 console.error("Erro ao restaurar dados:", e);
@@ -2600,8 +3591,11 @@ ${editableText}
             const salesData = sales;
             
             const paidSales = sales.filter(sale => sale.status === 'quitado');
-            const inProgressSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && !sale.parcels.some(p => new Date(p.dueDate) < new Date()));
-            const overdueSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && sale.parcels.some(p => new Date(p.dueDate) < new Date()));
+            
+            // CORREÇÃO APLICADA AQUI: Adiciona a verificação p.status !== 'pago' para maior coerência
+            const inProgressSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && !sale.parcels.some(p => p.status !== 'pago' && new Date(p.dueDate) < new Date() && p.value > 0));
+            const overdueSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && sale.parcels.some(p => p.status !== 'pago' && new Date(p.dueDate) < new Date() && p.value > 0));
+
             const canceledSales = sales.filter(sale => sale.status === 'cancelado');
             const pendingPaymentCount = inProgressSales.length + overdueSales.length;
 
@@ -2611,7 +3605,8 @@ ${editableText}
                     totalClientes: clientsData.length,
                     totalProdutos: productsData.length,
                     totalVendas: salesData.length,
-                    faturamentoTotal: salesData.reduce((sum, s) => sum + (s.totalValue || 0), 0),
+                    // Total de faturamento deve ser o total original (não o remanescente)
+                    faturamentoTotalOriginal: salesData.reduce((sum, s) => sum + (s.totalValue || 0), 0), 
                     vendasPagas: paidSales.length,
                     vendasEmAndamento: inProgressSales.length,
                     vendasVencidas: overdueSales.length,
@@ -2623,6 +3618,12 @@ ${editableText}
                 vendas: salesData.map(sale => {
                     const client = clientsData.find(c => c.id === sale.clientId);
                     const clientName = client ? client.name : 'Cliente Removido';
+                    
+                    // Encontra o valor total ORIGINAL da venda (sem abatimentos)
+                    const originalTotal = (sale.products || []).reduce((sum, p) => sum + (p.quantity * p.value), 0);
+                    // Calcula o total já recebido (original - remanescente)
+                    const totalRemanescente = sale.parcels.reduce((sum, p) => sum + (p.value || 0), 0);
+                    const totalRecebido = originalTotal - totalRemanescente;
 
                     const detailedProducts = (sale.products || []).map(item => {
                         const selectedProduct = productsData.find(p => p.id === item.productId);
@@ -2640,10 +3641,13 @@ ${editableText}
                         id: sale.id,
                         cliente: clientName,
                         evento: sale.eventName,
-                        valorTotal: sale.totalValue,
+                        valorTotalOriginal: originalTotal,
+                        valorTotalRecebido: totalRecebido,
+                        valorTotalRemanescente: totalRemanescente,
                         dataVenda: new Date(sale.createdAt).toLocaleString('pt-BR'),
                         produtosDetalhado: detailedProducts,
-                        parcelas: sale.parcels
+                        parcelas: sale.parcels,
+                        adiantamentos: sale.advancements || []
                     };
                 })
             };
@@ -2661,88 +3665,214 @@ ${editableText}
                 URL.revokeObjectURL(url);
                 showToast("Relatório JSON baixado com sucesso!");
             } else if (format === 'pdf') {
-                const pdfContent = `
-                    <style>
-                        body { font-family: 'Inter', sans-serif; margin: 2rem; background-color: #f3f4f6; color: #1e293b; }
-                        h1, h2, h3 { color: #1f2937; }
-                        .header, .section { margin-bottom: 2rem; }
-                        .header h1 { font-size: 2rem; font-weight: bold; text-align: center; }
-                        .section-title { font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem; }
-                        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-                        .stat-card { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; }
-                        .table-container { margin-top: 1rem; }
-                        table { width: 100%; border-collapse: collapse; }
-                        th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; }
-                        th { background-color: #f3f4f6; font-size: 0.75rem; color: #4b5563; text-transform: uppercase; }
-                        .client-info p, .product-info p, .sale-info p { margin: 0.25rem 0; }
-                    </style>
-                    <div class="header">
-                        <h1>Relatório Detalhado - VendavalStore</h1>
-                        <p>Gerado em: ${detailedReport.metadata.dataGeracao}</p>
-                    </div>
-                    <div class="section">
-                        <h2 class="section-title">Resumo Financeiro</h2>
-                        <div class="stat-grid">
-                            <div class="stat-card"><strong>Faturamento Total:</strong> R$ ${detailedReport.metadata.faturamentoTotal.toFixed(2).replace('.', ',')}</div>
-                            <div class="stat-card"><strong>Vendas Pagas:</strong> ${detailedReport.metadata.vendasPagas}</div>
-                            <div class="stat-card"><strong>Vendas em Andamento:</strong> ${detailedReport.metadata.vendasEmAndamento}</div>
-                            <div class="stat-card"><strong>Vendas Vencidas:</strong> ${detailedReport.metadata.vendasVencidas}</div>
-                            <div class="stat-card"><strong>Vendas Faltando a Pagar:</strong> ${detailedReport.metadata.vendasFaltandoPagar}</div>
-                            <div class="stat-card"><strong>Vendas Canceladas:</strong> ${detailedReport.metadata.vendasCanceladas}</div>
-                            <div class="stat-card"><strong>Total de Clientes:</strong> ${detailedReport.metadata.totalClientes}</div>
-                            <div class="stat-card"><strong>Total de Produtos:</strong> ${detailedReport.metadata.totalProdutos}</div>
-                        </div>
-                    </div>
-                    <div class="section">
-                        <h2 class="section-title">Detalhamento de Clientes</h2>
-                        ${detailedReport.clientes.map(cliente => `
-                            <div class="client-info" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
-                                <h3>Cliente: ${cliente.name}</h3>
-                                <p><strong>CPF:</strong> ${cliente.cpf}</p>
-                                <p><strong>Contato:</strong> ${cliente.phone} / ${cliente.email}</p>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="section">
-                        <h2 class="section-title">Detalhamento de Produtos</h2>
-                        ${detailedReport.produtos.map(produto => `
-                            <div class="product-info" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
-                                <h3>Produto: ${produto.name}</h3>
-                                <p><strong>Código:</strong> ${produto.code}</p>
-                                <p><strong>Custo:</strong> R$ ${produto.cost.toFixed(2).replace('.', ',')}</p>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="section">
-                        <h2 class="section-title">Detalhamento de Vendas</h2>
-                        ${detailedReport.vendas.map(sale => `
-                            <div class="sale-info" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
-                                <h3>Venda ID: ${sale.id}</h3>
-                                <p><strong>Cliente:</strong> ${sale.cliente}</p>
-                                <p><strong>Data:</strong> ${sale.dataVenda}</p>
-                                <p><strong>Evento:</strong> ${sale.evento}</p>
-                                <p><strong>Valor Total:</strong> R$ ${sale.valorTotal.toFixed(2).replace('.', ',')}</p>
-                                <p><strong>Produtos:</strong></p>
-                                <ul>
-                                    ${sale.produtosDetalhado.map(p => `<li>${p.quantidade}x ${p.produto} - Lote: ${p.lote} - R$ ${p.valorUnitario.toFixed(2).replace('.', ',')}</li>`).join('')}
-                                </ul>
-                                <p><strong>Parcelas:</strong></p>
-                                <ul>
-                                    ${sale.parcelas.map(p => `<li>Parcela ${p.parcelNumber}: R$ ${p.value.toFixed(2).replace('.', ',')} (Vencimento: ${new Date(p.dueDate).toLocaleDateString('pt-BR')}) - Status: ${p.status}</li>`).join('')}
-                                </ul>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(pdfContent);
-                printWindow.document.close();
-                printWindow.print();
+                // A função visualizarRelatorioPdf faz isso
             }
         };
 
-        window.visualizarRelatorioPdf = async () => {
+        // NOVA FUNÇÃO: Relatório de Pedidos Vencidos
+        window.visualizarRelatorioPedidosVencidos = async () => {
             if (!isAuthReady) {
+                showToast('Aguarde a conexão com o banco de dados...', 'warning');
+                return;
+            }
+
+            showToast("A gerar o relatório de pedidos vencidos... Por favor, aguarde.");
+
+            const today = new Date();
+            
+            // Filtra vendas que têm pelo menos uma parcela vencida
+            const overdueSales = sales.filter(sale => 
+                sale.status === 'em andamento' && 
+                sale.parcels && 
+                sale.parcels.some(p => p.status !== 'pago' && new Date(p.dueDate) < today && p.value > 0)
+            );
+
+            if (overdueSales.length === 0) {
+                showToast("Não há pedidos vencidos no momento!", 'info');
+                return;
+            }
+
+            // Prepara os dados do relatório
+            const reportData = overdueSales.map(sale => {
+                const client = clients.find(c => c.id === sale.clientId);
+                const clientName = client ? client.name : 'Cliente Removido';
+                const clientPhone = client ? client.phone : 'N/A';
+                const clientEmail = client ? client.email : 'N/A';
+
+                const originalTotal = (sale.products || []).reduce((sum, p) => sum + (p.quantity * p.value), 0);
+                const totalRemanescente = sale.parcels.reduce((sum, p) => sum + (p.value || 0), 0);
+                
+                // Filtra apenas as parcelas vencidas
+                const overdueParcels = sale.parcels.filter(p => 
+                    p.status !== 'pago' && new Date(p.dueDate) < today && p.value > 0
+                );
+
+                const totalOverdue = overdueParcels.reduce((sum, p) => sum + p.value, 0);
+
+                return {
+                    id: sale.id,
+                    cliente: clientName,
+                    telefone: clientPhone,
+                    email: clientEmail,
+                    evento: sale.eventName,
+                    valorTotalOriginal: originalTotal,
+                    valorTotalRemanescente: totalRemanescente,
+                    valorVencido: totalOverdue,
+                    dataVenda: new Date(sale.createdAt).toLocaleString('pt-BR'),
+                    parcelasVencidas: overdueParcels,
+                    produtos: (sale.products || []).map(item => {
+                        const product = products.find(p => p.id === item.productId);
+                        return {
+                            nome: product ? product.name : 'Produto Removido',
+                            codigo: product ? product.code : 'N/A',
+                            quantidade: item.quantity,
+                            lote: item.lot || 'N/A',
+                            valor: item.value
+                        };
+                    })
+                };
+            });
+
+            // Calcula totais gerais
+            const totalVencidoGeral = reportData.reduce((sum, s) => sum + s.valorVencido, 0);
+            const totalParcelasVencidas = reportData.reduce((sum, s) => sum + s.parcelasVencidas.length, 0);
+
+            // Gera o HTML do relatório
+            const pdfContent = `
+                <style>
+                    body { font-family: 'Inter', sans-serif; margin: 2rem; background-color: #fff3cd; color: #1e293b; }
+                    h1, h2, h3 { color: #d97706; }
+                    .header { margin-bottom: 2rem; text-align: center; background-color: #fff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                    .header h1 { font-size: 2rem; font-weight: bold; color: #c2410c; margin-bottom: 0.5rem; }
+                    .alert-box { background-color: #fed7aa; border-left: 4px solid #f97316; padding: 1rem; margin-bottom: 2rem; border-radius: 0.5rem; }
+                    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+                    .summary-card { background-color: #fff; border: 2px solid #fdba74; border-radius: 0.5rem; padding: 1rem; text-align: center; }
+                    .summary-card strong { font-size: 1.5rem; color: #ea580c; display: block; margin-top: 0.5rem; }
+                    .section { background-color: #fff; padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                    .section-title { font-size: 1.25rem; font-weight: bold; color: #c2410c; border-bottom: 2px solid #fed7aa; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+                    .sale-card { border: 2px solid #fdba74; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem; background-color: #fffbeb; }
+                    .sale-header { font-size: 1.1rem; font-weight: bold; color: #c2410c; margin-bottom: 0.75rem; }
+                    .info-row { margin: 0.5rem 0; }
+                    .info-label { font-weight: 600; color: #78350f; }
+                    .overdue-parcel { background-color: #fee2e2; border-left: 3px solid #dc2626; padding: 0.5rem; margin: 0.5rem 0; border-radius: 0.25rem; }
+                    .overdue-amount { color: #dc2626; font-weight: bold; font-size: 1.1rem; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+                    th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #fed7aa; }
+                    th { background-color: #fef3c7; font-size: 0.875rem; color: #78350f; font-weight: 600; }
+                </style>
+                <div class="header">
+                    <h1>⚠️ RELATÓRIO DE PEDIDOS VENCIDOS</h1>
+                    <p style="color: #78350f; font-weight: 500;">VendavalStore - Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+                </div>
+                
+                <div class="alert-box">
+                    <strong style="color: #c2410c;">ATENÇÃO:</strong> Este relatório contém todos os pedidos com parcelas vencidas que ainda não foram pagas.
+                </div>
+
+                <div class="summary">
+                    <div class="summary-card">
+                        <div style="color: #78350f; font-size: 0.875rem;">Total de Pedidos Vencidos</div>
+                        <strong>${reportData.length}</strong>
+                    </div>
+                    <div class="summary-card">
+                        <div style="color: #78350f; font-size: 0.875rem;">Total de Parcelas Vencidas</div>
+                        <strong>${totalParcelasVencidas}</strong>
+                    </div>
+                    <div class="summary-card">
+                        <div style="color: #78350f; font-size: 0.875rem;">Valor Total Vencido</div>
+                        <strong>R$ ${totalVencidoGeral.toFixed(2).replace('.', ',')}</strong>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2 class="section-title">Detalhamento dos Pedidos Vencidos</h2>
+                    ${reportData.map(sale => `
+                        <div class="sale-card">
+                            <div class="sale-header">📋 Pedido #${sale.id} - ${sale.cliente}</div>
+                            
+                            <div class="info-row">
+                                <span class="info-label">📞 Telefone:</span> ${sale.telefone}
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">✉️ Email:</span> ${sale.email}
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">🎪 Evento:</span> ${sale.evento}
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">📅 Data da Venda:</span> ${sale.dataVenda}
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">💰 Valor Total Original:</span> R$ ${sale.valorTotalOriginal.toFixed(2).replace('.', ',')}
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">💸 Valor Total Restante:</span> R$ ${sale.valorTotalRemanescente.toFixed(2).replace('.', ',')}
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label overdue-amount">⚠️ Valor Vencido:</span> <span class="overdue-amount">R$ ${sale.valorVencido.toFixed(2).replace('.', ',')}</span>
+                            </div>
+
+                            <div style="margin-top: 1rem;">
+                                <strong style="color: #78350f;">📦 Produtos:</strong>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Código</th>
+                                            <th>Produto</th>
+                                            <th>Qtd</th>
+                                            <th>Lote</th>
+                                            <th>Valor Unit.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${sale.produtos.map(p => `
+                                            <tr>
+                                                <td>${p.codigo}</td>
+                                                <td>${p.nome}</td>
+                                                <td>${p.quantidade}</td>
+                                                <td>${p.lote}</td>
+                                                <td>R$ ${p.valor.toFixed(2).replace('.', ',')}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div style="margin-top: 1rem;">
+                                <strong style="color: #dc2626;">⏰ Parcelas Vencidas:</strong>
+                                ${sale.parcelasVencidas.map(p => {
+                                    const diasVencidos = Math.floor((today - new Date(p.dueDate)) / (1000 * 60 * 60 * 24));
+                                    return `
+                                        <div class="overdue-parcel">
+                                            <strong>Parcela ${p.parcelNumber}</strong><br>
+                                            Valor: <strong>R$ ${p.value.toFixed(2).replace('.', ',')}</strong><br>
+                                            Vencimento: ${new Date(p.dueDate).toLocaleDateString('pt-BR')}<br>
+                                            <span style="color: #dc2626; font-weight: 600;">Vencida há ${diasVencidos} dia(s)</span>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="section" style="background-color: #fed7aa; border: 2px solid #f97316;">
+                    <h3 style="margin: 0; color: #c2410c;">💡 RESUMO FINAL</h3>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem; color: #78350f;">
+                        <strong>${reportData.length}</strong> pedido(s) com <strong>${totalParcelasVencidas}</strong> parcela(s) vencida(s),
+                        totalizando <strong style="color: #dc2626; font-size: 1.25rem;">R$ ${totalVencidoGeral.toFixed(2).replace('.', ',')}</strong> em atraso.
+                    </p>
+                </div>
+            `;
+
+            const pdfWindow = window.open('', '_blank');
+            pdfWindow.document.write(pdfContent);
+            pdfWindow.document.close();
+            showToast("Relatório de pedidos vencidos gerado com sucesso!");
+        };
+
+        window.visualizarRelatorioPdf = async () => {
+             if (!isAuthReady) {
                 showToast('Aguarde a conexão com o banco de dados...', 'warning');
                 return;
             }
@@ -2754,10 +3884,16 @@ ${editableText}
             const salesData = sales;
             
             const paidSales = sales.filter(sale => sale.status === 'quitado');
-            const inProgressSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && !sale.parcels.some(p => new Date(p.dueDate) < new Date()));
-            const overdueSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && sale.parcels.some(p => new Date(p.dueDate) < new Date()));
+
+            // CORREÇÃO APLICADA AQUI: Adiciona a verificação p.status !== 'pago' para maior coerência
+            const inProgressSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && !sale.parcels.some(p => p.status !== 'pago' && new Date(p.dueDate) < new Date() && p.value > 0));
+            const overdueSales = sales.filter(sale => sale.status === 'em andamento' && sale.parcels && sale.parcels.some(p => p.status !== 'pago' && new Date(p.dueDate) < new Date() && p.value > 0));
+            
             const canceledSales = sales.filter(sale => sale.status === 'cancelado');
             const pendingPaymentCount = inProgressSales.length + overdueSales.length;
+            
+            // Recalcular faturamento total original (apenas para o resumo)
+            const faturamentoTotalOriginal = salesData.reduce((sum, s) => sum + (s.products || []).reduce((sumP, p) => sumP + (p.quantity * p.value), 0), 0);
 
             const detailedReport = {
                 metadata: {
@@ -2765,7 +3901,7 @@ ${editableText}
                     totalClientes: clientsData.length,
                     totalProdutos: productsData.length,
                     totalVendas: salesData.length,
-                    faturamentoTotal: salesData.reduce((sum, s) => sum + (s.totalValue || 0), 0),
+                    faturamentoTotalOriginal: faturamentoTotalOriginal,
                     vendasPagas: paidSales.length,
                     vendasEmAndamento: inProgressSales.length,
                     vendasVencidas: overdueSales.length,
@@ -2777,6 +3913,10 @@ ${editableText}
                 vendas: salesData.map(sale => {
                     const client = clientsData.find(c => c.id === sale.clientId);
                     const clientName = client ? client.name : 'Cliente Removido';
+
+                    const originalTotal = (sale.products || []).reduce((sum, p) => sum + (p.quantity * p.value), 0);
+                    const totalRemanescente = sale.parcels.reduce((sum, p) => sum + (p.value || 0), 0);
+                    const totalRecebido = originalTotal - totalRemanescente;
 
                     const detailedProducts = (sale.products || []).map(item => {
                         const selectedProduct = productsData.find(p => p.id === item.productId);
@@ -2794,10 +3934,13 @@ ${editableText}
                         id: sale.id,
                         cliente: clientName,
                         evento: sale.eventName,
-                        valorTotal: sale.totalValue,
+                        valorTotalOriginal: originalTotal,
+                        valorTotalRecebido: totalRecebido,
+                        valorTotalRemanescente: totalRemanescente,
                         dataVenda: new Date(sale.createdAt).toLocaleString('pt-BR'),
                         produtosDetalhado: detailedProducts,
-                        parcelas: sale.parcels
+parcelas: sale.parcels,
+                        adiantamentos: sale.advancements || []
                     };
                 })
             };
@@ -2816,6 +3959,8 @@ ${editableText}
                     th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; }
                     th { background-color: #f3f4f6; font-size: 0.75rem; color: #4b5563; text-transform: uppercase; }
                     .client-info p, .product-info p, .sale-info p { margin: 0.25rem 0; }
+                    .payment-detail { margin-top: 0.5rem; border-top: 1px dashed #ccc; padding-top: 0.5rem; font-size: 0.9em; }
+                    .advancement { color: #16a34a; font-weight: bold; }
                 </style>
                 <div class="header">
                     <h1>Relatório Detalhado - VendavalStore</h1>
@@ -2824,7 +3969,7 @@ ${editableText}
                 <div class="section">
                     <h2 class="section-title">Resumo Financeiro</h2>
                     <div class="stat-grid">
-                        <div class="stat-card"><strong>Faturamento Total:</strong> R$ ${detailedReport.metadata.faturamentoTotal.toFixed(2).replace('.', ',')}</div>
+                        <div class="stat-card"><strong>Faturamento Total Original:</strong> R$ ${detailedReport.metadata.faturamentoTotalOriginal.toFixed(2).replace('.', ',')}</div>
                         <div class="stat-card"><strong>Vendas Pagas:</strong> ${detailedReport.metadata.vendasPagas}</div>
                         <div class="stat-card"><strong>Vendas em Andamento:</strong> ${detailedReport.metadata.vendasEmAndamento}</div>
                         <div class="stat-card"><strong>Vendas Vencidas:</strong> ${detailedReport.metadata.vendasVencidas}</div>
@@ -2851,28 +3996,55 @@ ${editableText}
                             <h3>Produto: ${produto.name}</h3>
                             <p><strong>Código:</strong> ${produto.code}</p>
                             <p><strong>Custo:</strong> R$ ${produto.cost.toFixed(2).replace('.', ',')}</p>
+                            <p><strong>Estoque:</strong> ${produto.stock}</p>
                         </div>
                     `).join('')}
                 </div>
                 <div class="section">
                     <h2 class="section-title">Detalhamento de Vendas</h2>
-                    ${detailedReport.vendas.map(sale => `
-                        <div class="sale-info" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
-                            <h3>Venda ID: ${sale.id}</h3>
-                            <p><strong>Cliente:</strong> ${sale.cliente}</p>
-                            <p><strong>Data:</strong> ${sale.dataVenda}</p>
-                            <p><strong>Evento:</strong> ${sale.evento}</p>
-                            <p><strong>Valor Total:</strong> R$ ${sale.valorTotal.toFixed(2).replace('.', ',')}</p>
-                            <p><strong>Produtos:</strong></p>
-                            <ul>
-                                ${sale.produtosDetalhado.map(p => `<li>${p.quantidade}x ${p.produto} - Lote: ${p.lote} - R$ ${p.valorUnitario.toFixed(2).replace('.', ',')}</li>`).join('')}
-                            </ul>
-                            <p><strong>Parcelas:</strong></p>
-                            <ul>
-                                ${sale.parcelas.map(p => `<li>Parcela ${p.parcelNumber}: R$ ${p.value.toFixed(2).replace('.', ',')} (Vencimento: ${new Date(p.dueDate).toLocaleDateString('pt-BR')}) - Status: ${p.status}</li>`).join('')}
-                            </ul>
-                        </div>
-                    `).join('')}
+                    ${detailedReport.vendas.map(sale => {
+                        // Mescla e ordena parcelas e adiantamentos para o PDF
+                        const items = [];
+                        (sale.parcelas || []).forEach(p => {
+                            const isAbated = p.value <= 0;
+                            const statusDisplay = isAbated ? 'Pago (Abatido)' : p.status.charAt(0).toUpperCase() + p.status.slice(1);
+                            items.push({
+                                type: 'parcel',
+                                sortDate: p.dueDate,
+                                display: `<li>Parcela ${p.parcelNumber}: R$ ${p.value.toFixed(2).replace('.', ',')} (Vencimento: ${new Date(p.dueDate).toLocaleDateString('pt-BR')}) - Status: <strong>${statusDisplay}</strong></li>`
+                            });
+                        });
+                        (sale.adiantamentos || []).forEach(adv => {
+                            const parcelAbatida = (sale.parcelas || []).find(p => p.parcelNumber === (adv.parcelIndex + 1));
+                            items.push({
+                                type: 'advancement',
+                                sortDate: adv.date, 
+                                display: `<li class="advancement">[ADTO] Data: ${new Date(adv.date).toLocaleDateString('pt-BR')} | Status: Adiantamento Pago | Valor: R$ ${adv.value.toFixed(2).replace('.', ',')} -> Abatido a partir da Parcela ${parcelAbatida ? parcelAbatida.parcelNumber : 'N/A'}</li>`
+                            });
+                        });
+
+                        items.sort((a, b) => new Date(a.sortDate) - new Date(b.sortDate));
+                        const parcelAdvancementList = items.map(item => item.display).join('');
+
+                        return `
+                            <div class="sale-info" style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; border-radius: 0.5rem;">
+                                <h3>Venda ID: ${sale.id}</h3>
+                                <p><strong>Cliente:</strong> ${sale.cliente}</p>
+                                <p><strong>Data:</strong> ${sale.dataVenda}</p>
+                                <p><strong>Evento:</strong> ${sale.evento}</p>
+                                <p><strong>Valor Total Original:</strong> R$ ${sale.valorTotalOriginal.toFixed(2).replace('.', ',')}</p>
+                                <p><strong>Valor Remanescente:</strong> R$ ${sale.valorTotalRemanescente.toFixed(2).replace('.', ',')}</p>
+                                <p><strong>Produtos:</strong></p>
+                                <ul>
+                                    ${sale.produtosDetalhado.map(p => `<li>${p.quantidade}x ${p.produto} - Lote: ${p.lote} - R$ ${p.valorUnitario.toFixed(2).replace('.', ',')}</li>`).join('')}
+                                </ul>
+                                <p class="payment-detail"><strong>Pagamentos e Parcelas:</strong></p>
+                                <ul>
+                                    ${parcelAdvancementList}
+                                </ul>
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
             `;
             const pdfWindow = window.open('', '_blank');
@@ -2893,6 +4065,260 @@ ${editableText}
             }, 3000);
         }
 
+        /**
+         * NOVA FUNÇÃO: Calcula a quantidade total vendida de cada produto.
+         * @returns {Array<Object>} Lista de produtos com total vendido e nome, ordenada por quantidade.
+         */
+        function getProductsSoldSummary() {
+            const soldSummary = {};
+            let totalOverall = 0;
+
+            sales.forEach(sale => {
+                if (sale.products) {
+                    sale.products.forEach(item => {
+                        const productId = item.productId;
+                        const quantity = item.quantity || 0;
+                        
+                        // Garante que só conta produtos de vendas não canceladas ou quitadas
+                        if (sale.status !== 'cancelado') {
+                            if (soldSummary[productId]) {
+                                soldSummary[productId].totalSold += quantity;
+                            } else {
+                                const productInfo = products.find(p => p.id === productId);
+                                soldSummary[productId] = {
+                                    name: productInfo ? productInfo.name : 'Produto Removido',
+                                    code: productInfo ? productInfo.code : 'N/A',
+                                    totalSold: quantity
+                                };
+                            }
+                            totalOverall += quantity;
+                        }
+                    });
+                }
+            });
+
+            const summaryArray = Object.values(soldSummary);
+            // Ordena por quantidade total vendida (decrescente)
+            summaryArray.sort((a, b) => b.totalSold - a.totalSold);
+            
+            return { summary: summaryArray, totalOverall };
+        }
+
+        /**
+         * NOVA FUNÇÃO: Gera um relatório PDF dos produtos vendidos.
+         */
+        window.visualizarRelatorioProdutosVendidos = () => {
+            const { summary, totalOverall } = getProductsSoldSummary();
+
+            if (summary.length === 0) {
+                showToast("Não há produtos vendidos para gerar o relatório.", 'warning');
+                return;
+            }
+
+            const productsTableRows = summary.map(item => `
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                    <td style="padding: 0.75rem;">${item.code}</td>
+                    <td style="padding: 0.75rem;">${item.name}</td>
+                    <td style="padding: 0.75rem; text-align: right;">${item.totalSold}</td>
+                </tr>
+            `).join('');
+
+            const content = `
+                <style>
+                    body { font-family: 'Inter', sans-serif; margin: 2rem; color: #1e293b; }
+                    .header { text-align: center; margin-bottom: 2rem; }
+                    .header h1 { font-size: 2rem; font-weight: bold; color: #1f2937; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+                    th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; }
+                    th { background-color: #f3f4f6; font-size: 0.75rem; color: #4b5563; text-transform: uppercase; }
+                    .total-row { background-color: #e2e8f0; font-weight: bold; }
+                    .total-row td { border-top: 2px solid #1e293b; }
+                </style>
+                <div class="header">
+                    <h1>Relatório de Produtos Vendidos (Todas as Vendas)</h1>
+                    <p>Período: Todas as Vendas | Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">Código</th>
+                            <th style="width: 65%;">Nome do Produto</th>
+                            <th style="width: 20%; text-align: right;">Total Vendido</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${productsTableRows}
+                        <tr class="total-row">
+                            <td colspan="2" style="padding: 0.75rem; text-align: left;">TOTAL GERAL DE ITENS VENDIDOS</td>
+                            <td style="padding: 0.75rem; text-align: right;">${totalOverall}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+
+            const pdfWindow = window.open('', '_blank');
+            pdfWindow.document.write(content);
+            pdfWindow.document.close();
+            pdfWindow.print();
+            showToast("Visualizando relatório de produtos vendidos em PDF...");
+        };
+        
+        // --- NOVO: Funções para o Relatório por Evento ---
+        
+        window.showReportByEventModal = () => {
+             // Garante que o select está preenchido
+            populateReportEventSelect();
+            document.getElementById('reportByEventModal').classList.remove('hidden');
+        };
+
+        window.hideReportByEventModal = () => {
+            document.getElementById('reportByEventModal').classList.add('hidden');
+        };
+
+        window.generateEventReport = () => {
+            const eventId = document.getElementById('reportEventSelect').value;
+            if (!eventId) {
+                showToast("Por favor, selecione um evento.", 'warning');
+                return;
+            }
+            visualizarRelatorioPorEvento(eventId);
+            hideReportByEventModal();
+        };
+
+        /**
+         * NOVA FUNÇÃO: Gera o relatório em PDF dos produtos vendidos em um evento específico.
+         * @param {string} eventId ID do evento selecionado.
+         */
+        window.visualizarRelatorioPorEvento = (eventId) => {
+            const event = events.find(e => e.id === eventId);
+            const eventName = event ? event.name : 'Evento Não Encontrado';
+
+            // 1. Filtra as vendas pelo evento, ignorando canceladas
+            const salesInEvent = sales.filter(s => s.eventId === eventId && s.status !== 'cancelado');
+            
+            if (salesInEvent.length === 0) {
+                showToast(`Nenhuma venda encontrada para o evento "${eventName}".`, 'warning');
+                return;
+            }
+
+            // 2. Agrupa e soma os produtos vendidos
+            const soldSummary = {};
+            let totalOverall = 0;
+            let totalRevenue = 0;
+            let totalPaid = 0;
+            let totalPending = 0;
+
+            salesInEvent.forEach(sale => {
+                if (sale.products) {
+                    sale.products.forEach(item => {
+                        const productId = item.productId;
+                        const quantity = item.quantity || 0;
+                        const value = item.value || 0;
+                        
+                        const productInfo = products.find(p => p.id === productId);
+                        const productName = productInfo ? productInfo.name : 'Produto Removido';
+                        const productCode = productInfo ? productInfo.code : 'N/A';
+                        
+                        if (soldSummary[productId]) {
+                            soldSummary[productId].totalSold += quantity;
+                        } else {
+                            soldSummary[productId] = {
+                                name: productName,
+                                code: productCode,
+                                value: value, // Mantém o valor unitário da primeira ocorrência para exibição
+                                totalSold: quantity
+                            };
+                        }
+                        totalOverall += quantity;
+                        totalRevenue += quantity * value;
+                    });
+                }
+
+                // Calcula total pago e total a pagar baseado nas parcelas
+                if (sale.parcels && Array.isArray(sale.parcels)) {
+                    sale.parcels.forEach(parcel => {
+                        const parcelValue = parcel.value || 0;
+                        if (parcel.status === 'pago') {
+                            totalPaid += parcelValue;
+                        } else {
+                            totalPending += parcelValue;
+                        }
+                    });
+                }
+            });
+
+            const summaryArray = Object.values(soldSummary);
+            // Ordena por quantidade total vendida (decrescente)
+            summaryArray.sort((a, b) => b.totalSold - a.totalSold);
+            
+            // 3. Monta o HTML do relatório em PDF
+            const productsTableRows = summaryArray.map(item => `
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                    <td style="padding: 0.75rem;">${item.code}</td>
+                    <td style="padding: 0.75rem;">${item.name}</td>
+                    <td style="padding: 0.75rem; text-align: right;">R$ ${item.value.toFixed(2).replace('.', ',')}</td>
+                    <td style="padding: 0.75rem; text-align: right;">${item.totalSold}</td>
+                    <td style="padding: 0.75rem; text-align: right;">R$ ${(item.value * item.totalSold).toFixed(2).replace('.', ',')}</td>
+                </tr>
+            `).join('');
+
+            const content = `
+                <style>
+                    body { font-family: 'Inter', sans-serif; margin: 2rem; color: #1e293b; }
+                    .header { text-align: center; margin-bottom: 2rem; }
+                    .header h1 { font-size: 2rem; font-weight: bold; color: #1f2937; }
+                    .header h2 { font-size: 1.5rem; color: #4b5563; margin-top: 0.5rem; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+                    th, td { text-align: left; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; }
+                    th { background-color: #e2e8f0; font-size: 0.75rem; color: #1e293b; text-transform: uppercase; }
+                    .total-row { background-color: #d1d5db; font-weight: bold; }
+                    .total-row td { border-top: 2px solid #1e293b; }
+                    .summary-box { border: 2px solid #3b82f6; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; background-color: #eff6ff; }
+                    .summary-box p { font-size: 1.1rem; }
+                </style>
+                <div class="header">
+                    <h1>Relatório de Vendas por Evento</h1>
+                    <h2>Evento: ${eventName}</h2>
+                    <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+                </div>
+
+                <div class="summary-box">
+                    <p><strong>Total de Vendas no Evento:</strong> ${salesInEvent.length}</p>
+                    <p><strong>Total Geral de Produtos Vendidos:</strong> ${totalOverall}</p>
+                    <p><strong>Faturamento Total (Valor de Venda):</strong> R$ ${totalRevenue.toFixed(2).replace('.', ',')}</p>
+                    <p style="color: #10B981;"><strong>Total Pago:</strong> R$ ${totalPaid.toFixed(2).replace('.', ',')}</p>
+                    <p style="color: #F59E0B;"><strong>Total a Pagar:</strong> R$ ${totalPending.toFixed(2).replace('.', ',')}</p>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 10%;">Código</th>
+                            <th style="width: 40%;">Nome do Produto</th>
+                            <th style="width: 15%; text-align: right;">Valor Unitário (R$)</th>
+                            <th style="width: 15%; text-align: right;">Quantidade Total</th>
+                            <th style="width: 20%; text-align: right;">Valor Total (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${productsTableRows}
+                        <tr class="total-row">
+                            <td colspan="4" style="padding: 0.75rem; text-align: left;">TOTAL GERAL DE PRODUTOS VENDIDOS</td>
+                            <td style="padding: 0.75rem; text-align: right;">R$ ${totalRevenue.toFixed(2).replace('.', ',')}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+
+            const pdfWindow = window.open('', '_blank');
+            pdfWindow.document.write(content);
+            pdfWindow.document.close();
+            pdfWindow.print();
+            showToast(`Visualizando relatório do evento "${eventName}" em PDF...`);
+        };
+
+
         window.showSection = showSection;
         window.deleteClientAndSales = deleteClientAndSales;
         window.showConfirmationModal = showConfirmationModal;
@@ -2905,6 +4331,8 @@ ${editableText}
         window.enviarEmail = enviarEmail;
         window.visualizarPdf = visualizarPdf;
         window.visualizarRelatorioPdf = visualizarRelatorioPdf;
+        window.visualizarRelatorioPedidosVencidos = visualizarRelatorioPedidosVencidos;
+        window.visualizarRelatorioProdutosVendidos = visualizarRelatorioProdutosVendidos; // Exporta a função
         window.openEditClientModal = openEditClientModal;
         window.hideEditClientModal = hideEditClientModal;
         window.saveAllChanges = saveAllChanges;
@@ -2925,6 +4353,11 @@ ${editableText}
         window.openTextEditModal = openTextEditModal;
         window.hideTextEditModal = hideTextEditModal;
         window.saveEditableText = saveEditableText;
+        window.applyAdvancePayment = applyAdvancePayment; // Exporta a nova função de adiantamento
+        window.showReportByEventModal = showReportByEventModal; // NOVO: Exporta a função do modal
+        window.hideReportByEventModal = hideReportByEventModal; // NOVO: Exporta a função para esconder o modal
+        window.generateEventReport = generateEventReport; // NOVO: Exporta a função para gerar o relatório
+        window.visualizarRelatorioPorEvento = visualizarRelatorioPorEvento; // NOVO: Exporta a função de relatório
     </script>
 </body>
 </html>
